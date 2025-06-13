@@ -38,7 +38,7 @@ public class CreateModuleHandler : IRequestHandler<CreateModuleRequestDto, Creat
         {
             Id = entity.Entity.Id,
             Name = entity.Entity.Name,
-            UserId = entity.Entity.UserId
+            //UserId = entity.Entity.UserId
         };
     }
 }

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "C8qnUdjDca4=",
+  "dgSpecHash": "vUEBHOWI1tM=",
   "success": true,
   "projectFilePath": "C:\\Users\\makey\\RiderProjects\\LearnIt\\src\\API\\API.csproj",
   "expectedPackageFiles": [
@@ -136,8 +136,10 @@
     {
       "code": "NU1608",
       "level": "Warning",
-      "warningLevel": 1,
       "message": "Detected package version outside of dependency constraint: AutoMapper.Extensions.Microsoft.DependencyInjection 12.0.1 requires AutoMapper (= 12.0.1) but version AutoMapper 14.0.0 was resolved.",
+      "projectPath": "C:\\Users\\makey\\RiderProjects\\LearnIt\\src\\API\\API.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\makey\\RiderProjects\\LearnIt\\src\\API\\API.csproj",
       "libraryId": "AutoMapper",
       "targetGraphs": [
         "net8.0"

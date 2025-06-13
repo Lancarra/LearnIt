@@ -1,6 +1,11 @@
-﻿namespace Application.Folder.Delete;
+﻿using FluentValidation;
 
-public class DeleteFolderRequestValidator
+namespace Application.Folder.Delete;
+
+public class DeleteFolderRequestValidator : AbstractValidator<DeleteFolderRequestDto>
 {
-    
+    public DeleteFolderRequestValidator()
+    {
+        RuleFor(x => x.Id).NotNull();
+    }
 }

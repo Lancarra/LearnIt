@@ -1,6 +1,8 @@
-﻿namespace Application.Folder.Delete;
+﻿using MediatR;
 
-public class DeleteFolderRequestDto
+namespace Application.Folder.Delete;
+
+public class DeleteFolderRequestDto : IRequest<DeleteFolderResponseDto>
 {
-    
+    public Guid Id { get; set; }
 }

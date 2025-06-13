@@ -62,6 +62,16 @@ namespace API
                     new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
                 //      new OperationSecurityScopeProcessor("Bearer"));
             });
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowReactApp", policy =>
+                {
+                    policy.WithOrigins("http://localhost:5178") 
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+            });
 
             var app = builder.Build();
 
@@ -109,7 +119,8 @@ namespace API
                     return internalUiRoute;
                 }
             });
-
+            
+            app.UseCors("AllowReactApp");
             app.UseAuthentication();
 
             app.MapControllers();

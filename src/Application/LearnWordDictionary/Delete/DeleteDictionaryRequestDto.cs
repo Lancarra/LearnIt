@@ -1,6 +1,8 @@
-﻿namespace Application.LearnWordDictionary.Delete;
+﻿using MediatR;
 
-public class DeleteDictionaryRequestDto
+namespace Application.LearnWordDictionary.Delete;
+
+public class DeleteDictionaryRequestDto : IRequest<DeleteDictionaryResponseDto>
 {
-    
+    public Guid Id { get; set; }
 }

@@ -1,6 +1,8 @@
-﻿namespace Application.Definition.Delete;
+﻿using MediatR;
 
-public class DeleteDefinitionRequestDto
+namespace Application.Definition.Delete;
+
+public class DeleteDefinitionRequestDto : IRequest<DeleteDefinitionResponseDto>
 {
-    
+    public Guid Id { get; set; }
 }

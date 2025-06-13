@@ -1,4 +1,6 @@
 ﻿using Application.CourseModule.Create;
+using Application.CourseModule.Delete;
+using Application.CourseModule.GetAll;
 using Application.CourseModule.Update;
 using Infrastructure.Security;
 using MediatR;
@@ -9,7 +11,7 @@ namespace API.Controllers.CourseModule;
 
 [Authorize]
 [ApiController]
-[Route("CourseModule")]
+[Route("course-module")]
 public class CourseModuleController: ControllerBase
 {
     private readonly IMediator _mediator;
@@ -18,7 +20,17 @@ public class CourseModuleController: ControllerBase
         _mediator = mediator;
     }
     
-    [HttpPost("CreateModule")]
+    [HttpGet("")]
+    
+    [HttpGet("get-all-modules")]
+    [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
+    public async Task<GetModuleResponseDto> GetModule()
+    {
+        var modules = await _mediator.Send(new GetModuleRequestDto());;
+        return modules;
+    }
+    
+    [HttpPost("create-module")]
     [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
     public async Task<CreateModuleResponseDto> CreateModule([FromBody] CreateModuleRequestDto request)
     {
@@ -26,8 +38,17 @@ public class CourseModuleController: ControllerBase
         return module;
     }
     
-    [HttpPut ("UpdateModule")]
+    [HttpPut ("update-module")]
+    [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
     public async Task<UpdateModuleResponseDto> UpdateModule([FromBody] UpdateModuleRequestDto request)
+    {
+        var module = await _mediator.Send(request);
+        return module;
+    }
+    
+    [HttpDelete ("delete-module")]
+    [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
+    public async Task<DeleteModuleResponseDto> DeleteModule([FromBody] DeleteModuleRequestDto request)
     {
         var module = await _mediator.Send(request);
         return module;

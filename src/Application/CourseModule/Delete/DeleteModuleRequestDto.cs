@@ -1,6 +1,8 @@
-﻿namespace Application.CourseModule.Delete;
+﻿using MediatR;
 
-public class DeleteModuleRequestDto
+namespace Application.CourseModule.Delete;
+
+public class DeleteModuleRequestDto : IRequest<DeleteModuleResponseDto>
 {
-    
+    public Guid Id { get; set; }
 }

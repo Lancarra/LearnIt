@@ -1,55 +1,32 @@
 ﻿using System.Net;
-using Application.Users.Create;
-using Domain;
-using Infrastructure.CurrentUserAccessor;
 using Infrastructure.Database;
 using Infrastructure.Errors;
-using Infrastructure.Security;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Definition.Delete;
 
-public class CreateUserHandler : IRequestHandler<CreateUserRequestDto, CreateUserResponseDto>
+public class DeleteDefinitionHandler : IRequestHandler<DeleteDefinitionRequestDto, DeleteDefinitionResponseDto>
 {
-    private readonly LearnContext _context;
-    private readonly IPasswordHasher _passwordHasher;
     private readonly IMediator _mediator;
-    private readonly ICurrentUserAccessor _currentUserAccessor;
-
-    public CreateUserHandler(LearnContext context, IPasswordHasher passwordHasher, IMediator mediator, ICurrentUserAccessor currentUserAccessor)
+    private readonly LearnContext _context;
+    
+    public DeleteDefinitionHandler(IMediator mediator, LearnContext context)
     {
-        _context = context;
-        _passwordHasher = passwordHasher;
         _mediator = mediator;
-        _currentUserAccessor = currentUserAccessor;
+        _context = context;
     }
-
-    public async Task<CreateUserResponseDto> Handle(CreateUserRequestDto message,
+    public async Task<DeleteDefinitionResponseDto> Handle(DeleteDefinitionRequestDto request,
         CancellationToken cancellationToken)
     {
-        if (await _context.Users.Where(x => x.Email == message.Email && !x.IsDeleted).AnyAsync(cancellationToken))
+        var definition = await _context.Definitions.FirstOrDefaultAsync(d => d.Id == request.Id);
+        if (definition == null)
         {
-            throw new RestException(HttpStatusCode.BadRequest, new { Email = "User with this email already exists!" });
+            throw new RestException(HttpStatusCode.NotFound, new {Id = $"Definition with id {request.Id} does not exist"});
         }
-
-        var salt = Guid.NewGuid().ToByteArray();
-
-        {
-            var person = new User()
-            {
-                Email = message.Email,
-                Hash = _passwordHasher.Hash(message.Password, salt),
-                Salt = salt,
-            };
-
-            _context.Users.Add(person);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return new CreateUserResponseDto()
-            {
-                UserId = person.UserId
-            };
-        }
+        _context.Definitions.Remove(definition);
+        await _context.SaveChangesAsync(cancellationToken);
+        
+        return new DeleteDefinitionResponseDto();
     }
 }

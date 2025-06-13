@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <Folder Include="Users\Delete\" />
-    <Folder Include="Users\Update\" />
     <Folder Include="Users\Read\" />
   </ItemGroup>
 

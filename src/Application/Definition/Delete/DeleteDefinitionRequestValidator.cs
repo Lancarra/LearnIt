@@ -1,6 +1,11 @@
-﻿namespace Application.Definition.Delete;
+﻿using FluentValidation;
 
-public class DeleteDefinitionRequestValidator
+namespace Application.Definition.Delete;
+
+public class DeleteDefinitionRequestValidator : AbstractValidator<DeleteDefinitionRequestDto>
 {
-    
+    public DeleteDefinitionRequestValidator()
+    {
+        RuleFor(x => x.Id).NotNull();
+    }
 }
