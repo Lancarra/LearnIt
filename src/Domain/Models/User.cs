@@ -14,7 +14,7 @@ namespace Domain
 
         public string Email { get; set; }
 
-        public string? ImageUrl { get; set; }
+        public Guid? BlobId { get; set; }
 
         [JsonIgnore] public byte[] Hash { get; set; }
 

@@ -1,4 +1,7 @@
-﻿using Infrastructure.CurrentUserAccessor;
+﻿using Azure.Storage;
+using Azure.Storage.Blobs;
+using Infrastructure.BlobStorage.Service;
+using Infrastructure.CurrentUserAccessor;
 using Infrastructure.Database;
 using Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +22,13 @@ public static class InfrastructureServiceExtension
               services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
               services.TryAddScoped<ICurrentUserAccessor, CurrentUserAccessor.CurrentUserAccessor>();
 
-              services.AddDbContext<LearnContext>(option =>
+              var blobSettings = config.GetSection("BlobSettings");
+              var credential = new StorageSharedKeyCredential(blobSettings["AccountName"], blobSettings["AccountKey"]);
+              var uri = blobSettings["Uri"];
+              services.AddSingleton<IBlobService, BlobService>();
+              services.AddSingleton(b => new BlobServiceClient(new Uri(uri), credential));
+
+services.AddDbContext<LearnContext>(option =>
               {
                   
                   if (databaseProvider == "SqlServer")

@@ -123,7 +123,8 @@ namespace Application.Users.Login
                 Token = userToken,
                 LearnItToken = LearnItToken,
                 TokenValidTo = token.ValidTo,
-                Has2FAuthEnabled = user.IsGoogleAuthEnabled
+                Has2FAuthEnabled = user.IsGoogleAuthEnabled,
+                BlobId = (Guid)user.BlobId,
             };
         }
     }
