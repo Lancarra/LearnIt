@@ -33,7 +33,7 @@ public class GetModuleHandler : IRequestHandler<GetModuleRequestDto, GetModuleRe
         {
             var moduleResponse = new GetModuleViewModel()
             {
-                Id = module.Id,
+                Id = module.Id, 
                 Name = module.Name,
                 UserId = module.UserId
             };

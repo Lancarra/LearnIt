@@ -1,5 +1,6 @@
 ﻿using Application.Users._2FaUth.CheckIfEnabled;
 using Application.Users.Create;
+using Application.Users.Delete;
 using Application.Users.GetById;
 using Application.Users.Login;
 using Application.Users.Update;
@@ -45,6 +46,12 @@ public class UsersController : ControllerBase
     
     [HttpPut("update-user")]
     public async Task<UpdateUserResponseDto> Update([FromBody] UpdateUserRequestDto request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpDelete("delete-user")]
+    public async Task<DeleteUserResponseDto> Delete([FromBody] DeleteUserRequestDto request)
     {
         return await _mediator.Send(request);
     }

@@ -2,11 +2,14 @@
 using Application.LearnWordDictionary.Delete;
 using Application.LearnWordDictionary.GetAll;
 using Application.LearnWordDictionary.Update;
+using Infrastructure.Security;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.LearnWordDictionary;
 
+[Authorize]
 [ApiController]
 [Route("learn-word-dictionary")]
 public class DictionaryController : ControllerBase
@@ -17,14 +20,19 @@ public class DictionaryController : ControllerBase
         _mediator = mediator;
     }
     
-    [HttpGet("get-all-dictionaries")]
-    public async Task<GetDictionaryResponseDto> GetDictionary()
+    [HttpGet("get-all-dictionaries/{parentFolderId}")]
+    [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
+    public async Task<GetDictionaryResponseDto> GetDictionary([FromRoute] Guid parentFolderId)
     {
-        var dictionaries = await _mediator.Send(new GetDictionaryRequestDto());
+        var dictionaries = await _mediator.Send(new GetDictionaryRequestDto
+        {
+            ParentFolderId = parentFolderId
+        });
         return dictionaries;
     }
     
     [HttpPost("create-dictionary")]
+    [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
     public async Task <CreateDictionaryResponseDto> CreateDictionary([FromBody] CreateDictionaryRequestDto request)
     {
         var dictionary = await _mediator.Send(request);
@@ -32,6 +40,7 @@ public class DictionaryController : ControllerBase
     }
     
     [HttpPut ("update-dictionary")]
+    [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
     public async Task<UpdateDictionaryResponseDto> UpdateDictionary([FromBody] UpdateDictionaryRequestDto request)
     {
         var dictionary = await _mediator.Send(request);
@@ -39,6 +48,7 @@ public class DictionaryController : ControllerBase
     }
     
     [HttpDelete("delete-dictionary")]
+    [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
     public async Task<DeleteDictionaryResponseDto> DeleteDictionary([FromBody] DeleteDictionaryRequestDto request)
     {
         var dictionary = await _mediator.Send(request);
