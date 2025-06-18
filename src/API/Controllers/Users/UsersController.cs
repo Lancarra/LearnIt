@@ -17,7 +17,7 @@ public class UsersController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IBlobService _blobService;
-    public UsersController(IMediator mediator, IBlobService blobService)
+    public UsersController(IMediator mediator,IBlobService blobService)
     {
         _mediator = mediator;
         _blobService = blobService;
@@ -31,11 +31,11 @@ public class UsersController : ControllerBase
     }
     
     [HttpPost("create-user")]
-    public async Task<CreateUserResponseDto> Create([FromBody] CreateUserRequestDto request , IFormFile file)
+    public async Task<CreateUserResponseDto> Create([FromBody] CreateUserRequestDto request )
     {
-        await using var stream = file.OpenReadStream();
-        var blobId = await _blobService.UploadAsync(stream, file.ContentType, Constants.Constants.CONTAINER); 
-        request.BlobId = blobId;
+       // await using var stream = file.OpenReadStream();
+        //var blobId = await _blobService.UploadAsync(stream, file.ContentType, Constants.Constants.CONTAINER); 
+        //request.BlobId = blobId;
 
         var response = await _mediator.Send(request);
 
@@ -57,13 +57,13 @@ public class UsersController : ControllerBase
     [HttpPut("update-user")]
     public async Task<UpdateUserResponseDto> Update([FromBody] UpdateUserRequestDto request, IFormFile file)
     {
-        if (request.BlobId != null)
+        if (file != null)
         {
-            await _blobService.DeleteAsync(request.BlobId, Constants.Constants.CONTAINER);
+            //await _blobService.DeleteAsync(request.BlobId, Constants.Constants.CONTAINER);
 
-            await using var stream = file.OpenReadStream();
-            var blobId = await _blobService.UploadAsync(stream, file.ContentType, Constants.Constants.CONTAINER);
-            request.BlobId = blobId;
+            //await using var stream = file.OpenReadStream();
+            //var blobId = await _blobService.UploadAsync(stream, file.ContentType, Constants.Constants.CONTAINER);
+            //request.BlobId = blobId;
         }
         return await _mediator.Send(request);
     }
@@ -73,7 +73,7 @@ public class UsersController : ControllerBase
     {
         var response = await _mediator.Send(request);
 
-        await _blobService.DeleteAsync(request.BlobId, Constants.Constants.CONTAINER);
+        //await _blobService.DeleteAsync(request.BlobId, Constants.Constants.CONTAINER);
 
         return response;
     }
@@ -89,6 +89,21 @@ public class UsersController : ControllerBase
                 return NotFound("Image not found");
             }
             return File(result.stream, result.contentType);
+        }
+        catch (Exception exception)
+        {
+            return BadRequest(exception.Message);
+        }
+    }
+    
+    [HttpPost("blob/add/")]
+    public async Task<IActionResult> UploadDocumentFile(IFormFile file)
+    {
+        try
+        {
+            await using var stream = file.OpenReadStream();
+            var blobId = await _blobService.UploadAsync(stream, file.ContentType, Constants.Constants.CONTAINER);
+            return Ok(blobId);
         }
         catch (Exception exception)
         {

@@ -27,8 +27,8 @@ public static class InfrastructureServiceExtension
               var uri = blobSettings["Uri"];
               services.AddSingleton<IBlobService, BlobService>();
               services.AddSingleton(b => new BlobServiceClient(new Uri(uri), credential));
-
-services.AddDbContext<LearnContext>(option =>
+              
+              services.AddDbContext<LearnContext>(option =>
               {
                   
                   if (databaseProvider == "SqlServer")
