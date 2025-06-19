@@ -124,7 +124,7 @@ namespace Application.Users.Login
                 LearnItToken = LearnItToken,
                 TokenValidTo = token.ValidTo,
                 Has2FAuthEnabled = user.IsGoogleAuthEnabled,
-                //BlobId = (Guid)user.BlobId,
+                BlobId = user.BlobId,
             };
         }
     }

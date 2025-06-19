@@ -13,7 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  blobstorage:
+  blob-storage:
     image: mcr.microsoft.com/azure-storage/azurite:latest
     container_name: learnit
     volumes:

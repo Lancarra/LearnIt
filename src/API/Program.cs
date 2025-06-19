@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using System.Text.Json.Serialization;
+using Azure.Storage.Blobs;
+using Infrastructure.BlobStorage.Service;
 using OpenApiSecurityScheme = NSwag.OpenApiSecurityScheme;
 
 
@@ -36,6 +38,7 @@ namespace API
             builder.Services.AddValidatorsFromAssembly(Assembly.Load("Application"));
             builder.Services.AddControllers().AddJsonOptions(options =>
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())); ;
+
 
             builder.Services.AddJwt();
 

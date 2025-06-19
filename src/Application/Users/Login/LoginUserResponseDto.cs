@@ -13,6 +13,6 @@ namespace Application.Users.Login
 
         public DateTime TokenValidTo { get; set; }
         public bool Has2FAuthEnabled { get; set; }
-        public Guid BlobId { get; set; }
+        public Guid? BlobId { get; set; }
     }
 }

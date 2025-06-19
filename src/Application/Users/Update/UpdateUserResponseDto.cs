@@ -7,4 +7,5 @@ public class UpdateUserResponseDto
     public string Token { get; set; }
 
     public DateTime TokenValidTo { get; set; }
+    public Guid? BlobId { get; set; }
 }

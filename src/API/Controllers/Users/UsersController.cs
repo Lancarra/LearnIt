@@ -4,8 +4,11 @@ using Application.Users.Delete;
 using Application.Users.GetById;
 using Application.Users.Login;
 using Application.Users.Update;
+using Azure;
+using Azure.Core;
 using Infrastructure.BlobStorage.Service;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
@@ -23,6 +26,7 @@ public class UsersController : ControllerBase
         _blobService = blobService;
     }
 
+    [Authorize]
     [HttpGet("get-user-by-id/{userId:int}")]
     public async Task<GetUserResponseDto> Get([FromRoute] int userId)
     {
@@ -33,13 +37,7 @@ public class UsersController : ControllerBase
     [HttpPost("create-user")]
     public async Task<CreateUserResponseDto> Create([FromBody] CreateUserRequestDto request )
     {
-       // await using var stream = file.OpenReadStream();
-        //var blobId = await _blobService.UploadAsync(stream, file.ContentType, Constants.Constants.CONTAINER); 
-        //request.BlobId = blobId;
-
-        var response = await _mediator.Send(request);
-
-        return response;
+        return await _mediator.Send(request);
     } 
     
     [HttpGet("check2factor/{email}")]
@@ -53,31 +51,26 @@ public class UsersController : ControllerBase
     {
         return await _mediator.Send(request);
     }
-    
-    [HttpPut("update-user")]
-    public async Task<UpdateUserResponseDto> Update([FromBody] UpdateUserRequestDto request, IFormFile file)
-    {
-        if (file != null)
-        {
-            //await _blobService.DeleteAsync(request.BlobId, Constants.Constants.CONTAINER);
 
-            //await using var stream = file.OpenReadStream();
-            //var blobId = await _blobService.UploadAsync(stream, file.ContentType, Constants.Constants.CONTAINER);
-            //request.BlobId = blobId;
-        }
+    [Authorize]
+    [HttpPut("update-user")]
+    public async Task<UpdateUserResponseDto> Update([FromBody] UpdateUserRequestDto request)
+    {
         return await _mediator.Send(request);
     }
 
+    [Authorize]
     [HttpDelete("delete-user")]
     public async Task<bool> Delete([FromBody] DeleteUserRequestDto request)
     {
         var response = await _mediator.Send(request);
 
-        //await _blobService.DeleteAsync(request.BlobId, Constants.Constants.CONTAINER);
+        await _blobService.DeleteAsync(request.BlobId, Constants.Constants.CONTAINER);
 
         return response;
     }
 
+    [Authorize]
     [HttpPut("blob/get/{fileBlobId:guid}")]
     public async Task<IActionResult> DownloadFileBlob(Guid fileBlobId)
     {
@@ -95,7 +88,8 @@ public class UsersController : ControllerBase
             return BadRequest(exception.Message);
         }
     }
-    
+
+    [Authorize]
     [HttpPost("blob/add/")]
     public async Task<IActionResult> UploadDocumentFile(IFormFile file)
     {
@@ -107,6 +101,37 @@ public class UsersController : ControllerBase
         }
         catch (Exception exception)
         {
+            return BadRequest(exception.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpPost("blob/update/{userId:int}")]
+    public async Task<IActionResult> UpdateDocumentFile([FromRoute] int userId, IFormFile file)
+    {
+        Guid blobId = Guid.Empty;
+
+        try
+        {
+            var response = await _mediator.Send(new GetUserRequestDto { UserId = userId });
+
+            if (response.BlobId != Guid.Empty && response.BlobId != null)
+            {
+                await _blobService.DeleteAsync((Guid)response.BlobId, Constants.Constants.CONTAINER);
+            }
+            await using var stream = file.OpenReadStream(); 
+            blobId = await _blobService.UploadAsync(stream, file.ContentType, Constants.Constants.CONTAINER);
+
+            var updateResponse = await _mediator.Send(new UpdateUserRequestDto
+            {
+                Email = response.Email,
+                BlobId = blobId
+            });
+            return Ok(updateResponse);
+        }
+        catch (Exception exception)
+        {
+            await _blobService.DeleteAsync(blobId, Constants.Constants.CONTAINER);
             return BadRequest(exception.Message);
         }
     }

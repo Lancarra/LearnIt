@@ -32,7 +32,8 @@
          {
              UserId = user.UserId,
              Email = user.Email,
-             Username = user.Username
+             Username = user.Username,
+             BlobId = user.BlobId,
          };
      }
  }

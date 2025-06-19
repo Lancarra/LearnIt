@@ -13,21 +13,22 @@ namespace Infrastructure;
 
 public static class InfrastructureServiceExtension
 {
-        public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration config)
+        public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
-              var connectionString = config.GetConnectionString("DefaultConnection");
-              var databaseProvider = config.GetConnectionString("DatabaseProvider");
+              var connectionString = configuration.GetConnectionString("DefaultConnection");
+              var databaseProvider = configuration.GetConnectionString("DatabaseProvider");
 
               services.AddScoped<IPasswordHasher, PasswordHasher>();
               services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
               services.TryAddScoped<ICurrentUserAccessor, CurrentUserAccessor.CurrentUserAccessor>();
 
-              var blobSettings = config.GetSection("BlobSettings");
+
+              var blobSettings = configuration.GetSection("BlobSettings");
               var credential = new StorageSharedKeyCredential(blobSettings["AccountName"], blobSettings["AccountKey"]);
               var uri = blobSettings["Uri"];
               services.AddSingleton<IBlobService, BlobService>();
               services.AddSingleton(b => new BlobServiceClient(new Uri(uri), credential));
-              
+             
               services.AddDbContext<LearnContext>(option =>
               {
                   
