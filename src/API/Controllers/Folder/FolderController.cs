@@ -1,7 +1,7 @@
 ﻿using Application.Folder.Create;
 using Application.Folder.Delete;
 using Application.Folder.GetAll;
-using Application.LearnWordDictionary.Update;
+using Application.Folder.Update;
 using Infrastructure.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -41,17 +41,17 @@ public class FolderController: ControllerBase
     
     [HttpPut ("update-folder")]
     [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
-    public async Task<UpdateDictionaryResponseDto> UpdateFolder([FromBody] UpdateDictionaryRequestDto request)
+    public async Task<UpdateFolderResponseDto> UpdateFolder([FromBody] UpdateFolderRequestDto request)
     {
         var folder = await _mediator.Send(request);
         return folder;
     }
     
-    [HttpDelete("delete-folder")]
+    [HttpDelete("delete-folder/{folderId}")]
     [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
-    public async Task<DeleteFolderResponseDto> DeleteFolder([FromBody] DeleteFolderRequestDto request)
+    public async Task<DeleteFolderResponseDto> DeleteFolder([FromRoute] Guid folderId)
     {
-        var folder = await _mediator.Send(request);
+        var folder = await _mediator.Send(new DeleteFolderRequestDto { Id = folderId });
         return folder;
     }
 }

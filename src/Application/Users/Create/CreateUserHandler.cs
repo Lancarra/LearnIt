@@ -36,7 +36,7 @@ public class CreateUserHandler : IRequestHandler<CreateUserRequestDto, CreateUse
                 Username = request.Username,
                 Hash = _passwordHasher.Hash(request.Password, salt),
                 Salt = salt,
-                BlobId = request.BlobId,
+                //BlobId = request.BlobId,
             };
             _context.Users.Add(person);
             await _context.SaveChangesAsync(cancellationToken);
@@ -44,7 +44,7 @@ public class CreateUserHandler : IRequestHandler<CreateUserRequestDto, CreateUse
             return new CreateUserResponseDto()
             {
                 UserId = person.UserId,
-                BlobId = request.BlobId,
+                //BlobId = request.BlobId,
             };
         }
     }

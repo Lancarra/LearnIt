@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Folder.Delete;
 
-public class DeleteFolderHandler
+public class DeleteFolderHandler : IRequestHandler<DeleteFolderRequestDto, DeleteFolderResponseDto>
 {
     private readonly IMediator _mediator;
     private readonly LearnContext _context;

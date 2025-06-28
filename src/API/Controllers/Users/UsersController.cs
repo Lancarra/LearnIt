@@ -2,8 +2,11 @@
 using Application.Users.Create;
 using Application.Users.Delete;
 using Application.Users.GetById;
+using Application.Users.GetRole;
+using Application.Users.GetUserRole;
 using Application.Users.Login;
 using Application.Users.Update;
+using Application.Users.UpdatePermission;
 using Azure;
 using Azure.Core;
 using Infrastructure.BlobStorage.Service;
@@ -40,6 +43,7 @@ public class UsersController : ControllerBase
         return await _mediator.Send(request);
     } 
     
+    [Authorize]
     [HttpGet("check2factor/{email}")]
     public async Task<bool> Check2Factor([FromRoute] string email)
     {
@@ -65,9 +69,30 @@ public class UsersController : ControllerBase
     {
         var response = await _mediator.Send(request);
 
-        await _blobService.DeleteAsync(request.BlobId, Constants.Constants.CONTAINER);
+        await _blobService.DeleteAsync(request.BlobId, Constants.Constants.USER_CONTAINER);
 
         return response;
+    }
+
+    [Authorize]
+    [HttpGet("get-user-role/{userId:int}")]
+    public async Task<GetUserRoleResponseDto> GetUserRole([FromRoute] int userId)
+    {
+        return await _mediator.Send(new GetUserRoleRequestDto { UserId = userId });
+    }
+
+    [Authorize]
+    [HttpGet("get-roles")]
+    public async Task<GetRoleResponseDto> GetRoles()
+    {
+        return await _mediator.Send(new GetRoleRequestDto());
+    }
+    
+    [Authorize]
+    [HttpPost("update-users-permissions")]
+    public async Task<UpdatePermissionResponseDto> UpdatePermission([FromBody] UpdatePermissionRequestDto request)
+    {
+       return await _mediator.Send(request);
     }
 
     [Authorize]
@@ -76,28 +101,12 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var result = await _blobService.DownloadAsync(fileBlobId, Constants.Constants.CONTAINER);
+            var result = await _blobService.DownloadAsync(fileBlobId, Constants.Constants.USER_CONTAINER);
             if (result == null || result.stream == null)
             {
                 return NotFound("Image not found");
             }
             return File(result.stream, result.contentType);
-        }
-        catch (Exception exception)
-        {
-            return BadRequest(exception.Message);
-        }
-    }
-
-    [Authorize]
-    [HttpPost("blob/add/")]
-    public async Task<IActionResult> UploadDocumentFile(IFormFile file)
-    {
-        try
-        {
-            await using var stream = file.OpenReadStream();
-            var blobId = await _blobService.UploadAsync(stream, file.ContentType, Constants.Constants.CONTAINER);
-            return Ok(blobId);
         }
         catch (Exception exception)
         {
@@ -117,10 +126,10 @@ public class UsersController : ControllerBase
 
             if (response.BlobId != Guid.Empty && response.BlobId != null)
             {
-                await _blobService.DeleteAsync((Guid)response.BlobId, Constants.Constants.CONTAINER);
+                await _blobService.DeleteAsync((Guid)response.BlobId, Constants.Constants.USER_CONTAINER);
             }
             await using var stream = file.OpenReadStream(); 
-            blobId = await _blobService.UploadAsync(stream, file.ContentType, Constants.Constants.CONTAINER);
+            blobId = await _blobService.UploadAsync(stream, file.ContentType, Constants.Constants.USER_CONTAINER);
 
             var updateResponse = await _mediator.Send(new UpdateUserRequestDto
             {
@@ -131,7 +140,7 @@ public class UsersController : ControllerBase
         }
         catch (Exception exception)
         {
-            await _blobService.DeleteAsync(blobId, Constants.Constants.CONTAINER);
+            await _blobService.DeleteAsync(blobId, Constants.Constants.USER_CONTAINER);
             return BadRequest(exception.Message);
         }
     }

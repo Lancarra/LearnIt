@@ -35,7 +35,7 @@ public class GetDefinitionHandler : IRequestHandler<GetDefinitionRequestDto, Get
                 Id = definition.Id,
                 Word = definition.Word,
                 Meaning = definition.Meaning,
-                BlobURL = definition.BlobURL,
+                BlobId = definition.BlobId,
                 DictionaryId = definition.DictionaryId
             };
                 definitionsResponse.Add(definitionResponse);

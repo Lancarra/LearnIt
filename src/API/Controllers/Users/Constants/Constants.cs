@@ -2,6 +2,7 @@
 {
     public static class Constants
     {
-        public const string CONTAINER = "user-images";
+        public const string USER_CONTAINER = "user-images";
+        public const string DEFINITION_CONTAINER = "definition-images";
     }
 }

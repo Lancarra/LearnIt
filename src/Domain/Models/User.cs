@@ -27,6 +27,8 @@ namespace Domain
         [JsonIgnore] public bool IsDeleted { get; set; }
         
         public virtual ICollection<CourseModule> CourseModules { get; set; }
+        
+        public virtual ICollection<UserRole> UserRoles { get; set; }
 
     }
 }

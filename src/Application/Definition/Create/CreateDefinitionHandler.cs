@@ -37,7 +37,7 @@ public class CreateDefinitionHandler : IRequestHandler<CreateDefinitionRequestDt
                 Id = Guid.NewGuid(),
                 Word = request.Word,
                 Meaning = request.Meaning,
-                BlobURL = request.BlobURL,
+                BlobId = request.BlobId,
                 DictionaryId = request.DictionaryId
             };
         var entity = await _context.Definitions.AddAsync(definition, cancellationToken);
@@ -48,7 +48,7 @@ public class CreateDefinitionHandler : IRequestHandler<CreateDefinitionRequestDt
                 Id = entity.Entity.Id,
                 Word = entity.Entity.Word,
                 Meaning = entity.Entity.Meaning,
-                BlobURL = entity.Entity.BlobURL,
+                BlobId = entity.Entity.BlobId,
                 DictionaryId = entity.Entity.DictionaryId
             };
     }

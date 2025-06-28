@@ -8,7 +8,7 @@ public class Definition
     
     public string Meaning { get; set; }
     
-    public string? BlobURL { get; set; }
+    public Guid? BlobId { get; set; }
     
     public virtual LearnWordDictionary Dictionary { get; set; }
     

@@ -30,6 +30,8 @@ public class UpdateUserHandler : IRequestHandler<UpdateUserRequestDto, UpdateUse
         var currentEmail = _currentUserAccessor.GetCurrentEmail();
         var user = await _context.Users.Where(x => x.Email == currentEmail && !x.IsDeleted).FirstOrDefaultAsync(cancellationToken);
         user.Email = message.Email ?? user.Email;
+        user.Username = message.Username ?? user.Username;
+
         
         if (message.BlobId != Guid.Empty || message.BlobId != null)
         {
@@ -54,9 +56,10 @@ public class UpdateUserHandler : IRequestHandler<UpdateUserRequestDto, UpdateUse
         return new UpdateUserResponseDto()
         {
             Email = user.Email,
-            BlobId = user.BlobId,
             Token = userToken,
-            TokenValidTo = token.ValidTo
+            TokenValidTo = token.ValidTo,
+            Username = user.Username,
+            BlobId = user.BlobId
         };
     }
 }

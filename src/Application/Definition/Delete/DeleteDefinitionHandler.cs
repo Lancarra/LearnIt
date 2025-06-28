@@ -27,6 +27,6 @@ public class DeleteDefinitionHandler : IRequestHandler<DeleteDefinitionRequestDt
         _context.Definitions.Remove(definition);
         await _context.SaveChangesAsync(cancellationToken);
         
-        return new DeleteDefinitionResponseDto();
+        return new DeleteDefinitionResponseDto(){BlobId = definition.BlobId};
     }
 }

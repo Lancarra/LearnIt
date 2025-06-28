@@ -4,6 +4,7 @@ using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(LearnContext))]
-    partial class LearnContextModelSnapshot : ModelSnapshot
+    [Migration("20250625160821_AddRole")]
+    partial class AddRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,7 +42,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CourseModules", (string)null);
+                    b.ToTable("CourseModules");
                 });
 
             modelBuilder.Entity("Domain.Models.Definition", b =>
@@ -66,7 +69,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("DictionaryId");
 
-                    b.ToTable("Definitions", (string)null);
+                    b.ToTable("Definitions");
                 });
 
             modelBuilder.Entity("Domain.Models.Folder", b =>
@@ -86,7 +89,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CourseModuleId");
 
-                    b.ToTable("Folders", (string)null);
+                    b.ToTable("Folders");
                 });
 
             modelBuilder.Entity("Domain.Models.LearnWordDictionary", b =>
@@ -106,7 +109,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ParentFolderId");
 
-                    b.ToTable("LearnWordDictionaries", (string)null);
+                    b.ToTable("LearnWordDictionaries");
                 });
 
             modelBuilder.Entity("Domain.Models.LogEvent", b =>
@@ -145,7 +148,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LogEvents", (string)null);
+                    b.ToTable("LogEvents");
                 });
 
             modelBuilder.Entity("Domain.Models.Role", b =>
@@ -165,7 +168,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("RoleId");
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("Domain.Models.UserRole", b =>
@@ -180,7 +183,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRole", (string)null);
+                    b.ToTable("UserRole");
                 });
 
             modelBuilder.Entity("Domain.User", b =>
@@ -221,7 +224,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Domain.Models.CourseModule", b =>

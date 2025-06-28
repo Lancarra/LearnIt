@@ -1,6 +1,6 @@
-﻿namespace Application.Definition.Create;
+namespace Application.Definition.GetById;
 
-public class CreateDefinitionResponseDto
+public class GetDefinitionByIdResponseDto
 {
     public Guid Id { get; set; }
     

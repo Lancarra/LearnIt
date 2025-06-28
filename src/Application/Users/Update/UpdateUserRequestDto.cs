@@ -9,6 +9,7 @@ public class UpdateUserRequestDto : IRequest<UpdateUserResponseDto>
     public string Password { get; set; }
 
     public string GoogleAuthCode { get; set; }
+    public string Username { get; set; }
 
     public Guid BlobId { get; set; }
 }

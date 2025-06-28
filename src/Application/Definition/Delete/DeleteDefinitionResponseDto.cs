@@ -2,5 +2,5 @@
 
 public class DeleteDefinitionResponseDto
 {
-    
+    public Guid? BlobId { get; set; }
 }
