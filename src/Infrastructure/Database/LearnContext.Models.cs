@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using Domain;
+using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database;
@@ -63,5 +64,13 @@ public partial class LearnContext
             .HasOne(ur => ur.Role)
             .WithMany(r => r.UserRoles)
             .HasForeignKey(ur => ur.RoleId);
+        
+        modelBuilder.Entity<Achievement>(r =>
+            {
+                r.HasKey(k => k.Id);
+                r.Property(p => p.Id).ValueGeneratedOnAdd();
+                r.HasMany(u => u.Users);
+            });
+            
     }
 }

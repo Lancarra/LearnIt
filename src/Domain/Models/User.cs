@@ -29,6 +29,10 @@ namespace Domain
         public virtual ICollection<CourseModule> CourseModules { get; set; }
         
         public virtual ICollection<UserRole> UserRoles { get; set; }
+        
+        public virtual Achievement? Achievement { get; set; }
+        public int? AchievementId { get; set; }
+        public int Rating { get; set; }
 
     }
 }

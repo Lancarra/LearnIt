@@ -1,6 +1,8 @@
+using System.Net;
 using Domain.Models;
 using Infrastructure.CurrentUserAccessor;
 using Infrastructure.Database;
+using Infrastructure.Errors;
 using Infrastructure.Helpers;
 using Infrastructure.Security;
 using MediatR;
@@ -22,10 +24,12 @@ public class UpdatePermissionHandler : IRequestHandler<UpdatePermissionRequestDt
     }
     public async Task<UpdatePermissionResponseDto> Handle(UpdatePermissionRequestDto request, CancellationToken cancellationToken)
     {
+        #region For any handler with admin permission //TODO
+
         var user = await _context.Users.Include(u => u.UserRoles)
-                                        .ThenInclude(ur => ur.Role)
-                                        .FirstOrDefaultAsync(x => x.Email == _currentUserAccessor.GetCurrentEmail() 
-                                                                && !x.IsDeleted, cancellationToken);
+            .ThenInclude(ur => ur.Role)
+            .FirstOrDefaultAsync(x => x.Email == _currentUserAccessor.GetCurrentEmail() 
+                                      && !x.IsDeleted, cancellationToken);
         PropertyChecker.CheckNullAndThrow404(user);
         
         var isAdmin = user.UserRoles.Any(ur => ur.Role.RoleName == "Admin");
@@ -34,22 +38,42 @@ public class UpdatePermissionHandler : IRequestHandler<UpdatePermissionRequestDt
         {
             throw new UnauthorizedAccessException("You don't have permission to update roles");       
         }
+        #endregion
         
-        var updateUser = await _context.Users.FirstOrDefaultAsync(x => x.UserId == request.UserId);
-        PropertyChecker.CheckNullAndThrow404(updateUser);
 
-        var role = await _context.Roles.FirstOrDefaultAsync(x => x.RoleId == request.RoleId);
-        PropertyChecker.CheckNullAndThrow404(role);
-
-        var userRole = new UserRole()
+        if (!request.DeleteRole)
         {
-            RoleId = request.RoleId,
-            Role = role,
-            User = updateUser,
-            UserId = updateUser.UserId,
-        };
-        await _context.UserRole.AddAsync(userRole);
-        await _context.SaveChangesAsync(cancellationToken);
-        return new UpdatePermissionResponseDto(){Result= $"Role {role.RoleName} add to user {updateUser.Username} successfully"};
+            var updateUser = await _context.Users.FirstOrDefaultAsync(x => x.UserId == request.UserId);
+            PropertyChecker.CheckNullAndThrow404(updateUser);
+
+            var role = await _context.Roles.FirstOrDefaultAsync(x => x.RoleId == request.RoleId);
+            PropertyChecker.CheckNullAndThrow404(role);
+
+            var userRole = new UserRole()
+            {
+                RoleId = request.RoleId,
+                Role = role,
+                User = updateUser,
+                UserId = updateUser.UserId,
+            };
+            await _context.UserRole.AddAsync(userRole);
+            await _context.SaveChangesAsync(cancellationToken);
+            return new UpdatePermissionResponseDto(){Result= $"Role {role.RoleName} add to user {updateUser.Username} successfully"};
+        }
+        else
+        {
+            var updateUser = await _context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).FirstOrDefaultAsync(x => x.UserId == request.UserId);
+            PropertyChecker.CheckNullAndThrow404(updateUser);
+            if (!updateUser.UserRoles.Any(ur => ur.RoleId == request.RoleId))
+            {
+                throw new RestException(HttpStatusCode.BadRequest,  new string($"User {updateUser.Username} doesn't have role {request.RoleId}"));
+            }
+            var role = updateUser.UserRoles.FirstOrDefault(ur => ur.RoleId == request.RoleId);
+            PropertyChecker.CheckNullAndThrow404(role);
+            
+            _context.UserRole.Remove(role);
+            await _context.SaveChangesAsync(cancellationToken);
+            return new UpdatePermissionResponseDto(){Result= $"Role {role.Role.RoleName} remove user {updateUser.Username} successfully"};
+        }
     }
 }
