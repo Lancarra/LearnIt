@@ -11,4 +11,6 @@ public class CreateDefinitionResponseDto
     public Guid? BlobId { get; set; }
     
     public Guid DictionaryId { get; set; }
+    
+    public string? ImageURL { get; set; }
 }

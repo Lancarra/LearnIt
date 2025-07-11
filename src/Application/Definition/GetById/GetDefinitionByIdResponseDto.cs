@@ -10,5 +10,7 @@ public class GetDefinitionByIdResponseDto
     
     public Guid? BlobId { get; set; }
     
+    public string? ImageURL { get; set; }
+    
     public Guid DictionaryId { get; set; }
 }

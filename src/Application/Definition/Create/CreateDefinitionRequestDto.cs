@@ -8,4 +8,5 @@ public class CreateDefinitionRequestDto : IRequest<CreateDefinitionResponseDto>
     public string Meaning { get; set; }
     public Guid? BlobId { get; set; }
     public Guid DictionaryId { get; set; }
+    public string? ImageURL { get; set; }
 }

@@ -41,6 +41,7 @@ public class UpdateDefinitionHandler : IRequestHandler<UpdateDefinitionRequestDt
         definition.Meaning = request.Meaning;
         definition.BlobId = request.BlobId;
         definition.DictionaryId = request.DictionaryId;
+        definition.ImageUrl = request.ImageURL;
         await _context.SaveChangesAsync(cancellationToken);
 
         return new UpdateDefinitionResponseDto()
@@ -49,7 +50,8 @@ public class UpdateDefinitionHandler : IRequestHandler<UpdateDefinitionRequestDt
             Word = definition.Word,
             Meaning = definition.Meaning,
             BlobId = definition.BlobId,
-            DictionaryId = definition.DictionaryId
+            DictionaryId = definition.DictionaryId,
+            ImageURL = definition.ImageUrl
         };
     }
 }

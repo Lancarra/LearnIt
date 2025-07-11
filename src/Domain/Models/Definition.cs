@@ -13,4 +13,6 @@ public class Definition
     public virtual LearnWordDictionary Dictionary { get; set; }
     
     public Guid DictionaryId { get; set;}
+    
+    public virtual string? ImageUrl { get; set; }
 }

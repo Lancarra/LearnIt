@@ -38,7 +38,8 @@ public class CreateDefinitionHandler : IRequestHandler<CreateDefinitionRequestDt
                 Word = request.Word,
                 Meaning = request.Meaning,
                 BlobId = request.BlobId,
-                DictionaryId = request.DictionaryId
+                DictionaryId = request.DictionaryId,
+                ImageUrl = request.ImageURL
             };
         var entity = await _context.Definitions.AddAsync(definition, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
@@ -49,7 +50,8 @@ public class CreateDefinitionHandler : IRequestHandler<CreateDefinitionRequestDt
                 Word = entity.Entity.Word,
                 Meaning = entity.Entity.Meaning,
                 BlobId = entity.Entity.BlobId,
-                DictionaryId = entity.Entity.DictionaryId
+                DictionaryId = entity.Entity.DictionaryId,
+                ImageURL = entity.Entity.ImageUrl
             };
     }
 }

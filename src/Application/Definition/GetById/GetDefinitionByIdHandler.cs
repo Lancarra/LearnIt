@@ -28,6 +28,7 @@ public class GetDefinitionByIdHandler : IRequestHandler<GetDefinitionByIdRequest
             Word = definitions.Word,
             Meaning = definitions.Meaning,  
             BlobId = definitions.BlobId,
+            ImageURL = definitions.ImageUrl,
             DictionaryId = definitions.DictionaryId
         };
     }

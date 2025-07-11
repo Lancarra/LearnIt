@@ -3,11 +3,11 @@
 services:
   postgres:
     image: postgres:latest
-    container_name: postgres_container
+    container_name: learnitDb
     environment:
-      POSTGRES_USER: db_admin
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: learnit
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: LearnIt
     ports:
       - "5432:5432"
     volumes:

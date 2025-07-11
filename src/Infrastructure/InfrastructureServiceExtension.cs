@@ -38,7 +38,7 @@ public static class InfrastructureServiceExtension
                   }
                   else if(databaseProvider == "Postgresql")
                   {
-                      option.UseNpgsql();
+                      option.UseNpgsql(connectionString);
                   }
               });
         }

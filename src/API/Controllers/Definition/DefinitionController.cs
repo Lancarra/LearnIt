@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.Definition;
 
-[Authorize]
+/*[Authorize]*/
 [ApiController]
 [Route("definition")]
 
@@ -40,7 +40,15 @@ public class DefinitionController:ControllerBase
         });
         return response;
     }
-
+    
+    [HttpGet("get-definition-id/{definitionId}")]
+    [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
+    public async Task<GetDefinitionByIdResponseDto> GetDefinitionById([FromRoute] Guid definitionId)
+    {
+        var response = await _mediator.Send(new GetDefinitionByIdRequestDto{DefinitionId = definitionId});
+       
+        return response;
+    }
     
     [HttpPost("create-definition")]
     [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
@@ -67,7 +75,7 @@ public class DefinitionController:ControllerBase
         return definition;
     }
 
-    [HttpPut("update-definition-image")]
+    [HttpPut("search-definition-image-google")]
     [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
     public async Task<string> GetImageUrlFromGoogle(string searchTerm, int imageIndex = 3)
     {
@@ -101,6 +109,13 @@ public class DefinitionController:ControllerBase
         }
     }
     
+    [HttpPut("search-definition-image-selenium")]
+    /*[Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]*/
+    public async Task<string> GetImageUrlFromSelenium(string searchTerm)
+    {
+        var result = await SearchUseSelenium.Search(searchTerm);
+        return result;
+    }
     #region Blob
     [HttpGet("blob/get/{fileBlobId:guid}")]
     public async Task<IActionResult> DownloadFileBlob(Guid fileBlobId)
@@ -154,36 +169,53 @@ public class DefinitionController:ControllerBase
     }
     
     
-    [HttpPost("blob/update-url/{defintionId:guid}")]
-    public async Task<IActionResult> UpdateDocumentFileUrl([FromRoute] Guid defintionId, string imageUrl)
+    [HttpPost("blob/update-url/")]
+    public async Task<IActionResult> UpdateDefinitionFileUrl([FromBody] UpdateDefinitionRequest request)
     {
         Guid blobId = Guid.Empty;
 
         try
         {
-            var response = await _mediator.Send(new GetDefinitionByIdRequestDto { DefinitionId = defintionId });
+            var response = await _mediator.Send(new GetDefinitionByIdRequestDto { DefinitionId = request.DefintionId });
 
             if (response.BlobId != null)
             {
                 await _blobService.DeleteAsync((Guid)response.BlobId, Constants.DEFINITION_CONTAINER);
             }
 
-            using (HttpClient client = new HttpClient())
+            if(request.SaveToBlob)
             {
-                var image = await client.GetStreamAsync(imageUrl);
-                await using var stream = image; 
-                blobId = await _blobService.UploadAsync(stream, "image/jpeg", Constants.DEFINITION_CONTAINER);
-            }
+                using (HttpClient client = new HttpClient())
+                {
+                    var image = await client.GetStreamAsync(request.ImageUrl);
+                    await using var stream = image; 
+                    blobId = await _blobService.UploadAsync(stream, "image/jpeg", Constants.DEFINITION_CONTAINER);
+                }
             
-            var updateResponse = await _mediator.Send(new UpdateDefinitionRequestDto
+                var updateResponse = await _mediator.Send(new UpdateDefinitionRequestDto
+                {
+                    Id = response.Id,
+                    Word = response.Word,
+                    Meaning = response.Meaning,
+                    DictionaryId = response.DictionaryId,
+                    BlobId = blobId,
+                    ImageURL = null,
+                });
+                return Ok(updateResponse);
+            }
+            else
             {
-                Id = response.Id,
-                Word = response.Word,
-                Meaning = response.Meaning,
-                DictionaryId = response.DictionaryId,
-                BlobId = blobId
-            });
-            return Ok(updateResponse);
+                var updateResponse = await _mediator.Send(new UpdateDefinitionRequestDto
+                {
+                    Id = response.Id,
+                    Word = response.Word,
+                    Meaning = response.Meaning,
+                    DictionaryId = response.DictionaryId,
+                    BlobId = null,
+                    ImageURL = request.ImageUrl,
+                });
+                return Ok(updateResponse);
+            }
         }
         catch (Exception exception)
         {
