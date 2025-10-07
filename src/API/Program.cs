@@ -69,7 +69,7 @@ namespace API
             {
                 options.AddPolicy("AllowReactApp", policy =>
                 {
-                    policy.WithOrigins("http://localhost:5178") 
+                    policy.WithOrigins("http://localhost:5173") 
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();

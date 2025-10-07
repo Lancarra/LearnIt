@@ -39,7 +39,7 @@ public class UpdateFolderHandler : IRequestHandler<UpdateFolderRequestDto, Updat
         
         folder.Name = request.Name;
         folder.CourseModuleId = request.CourseModuleId;
-        
+        _context.Update(folder);
         await _context.SaveChangesAsync(cancellationToken);
         
         return new UpdateFolderResponseDto()

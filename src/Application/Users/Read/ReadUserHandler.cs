@@ -24,7 +24,7 @@ namespace Application.Users.Read
         public async Task<ReadUserResponseDTO> Handle(ReadUserRequestDTO message, CancellationToken cancellationToken)
         {
 
-            var user = await _context.Users
+            var user = await _context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Email == message.Email && !x.IsDeleted, cancellationToken);
             if (user == null)
@@ -32,7 +32,12 @@ namespace Application.Users.Read
                 throw new RestException(HttpStatusCode.NotFound, new { User = Constants.NOT_FOUND });
             }
 
-            var userToken = await _jwtTokenGenerator.CreateToken(user.Email, 120);
+            var roles = string.Empty;
+            foreach (var role in user.UserRoles)
+            {
+                roles += role.Role.RoleName + ", ";
+            }
+            var userToken = await _jwtTokenGenerator.CreateToken(user.Email, roles,120);
             var token = new JwtSecurityTokenHandler().ReadJwtToken(userToken);
 
 

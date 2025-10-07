@@ -6,3 +6,4 @@ public class DeleteModuleRequestDto : IRequest<DeleteModuleResponseDto>
 {
     public Guid Id { get; set; }
 }
+

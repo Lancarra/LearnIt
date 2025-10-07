@@ -1,6 +1,7 @@
 ﻿using Application.Folder.Create;
 using Application.Folder.Delete;
 using Application.Folder.GetAll;
+using Application.Folder.GetById;
 using Application.Folder.Update;
 using Infrastructure.Security;
 using MediatR;
@@ -20,9 +21,21 @@ public class FolderController: ControllerBase
         _mediator = mediator;
     }
 
+    [HttpGet("get-by-id/{folderId}")]
+    [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
+    public async Task<GetFolderByIdResponseDto> GetFolderById([FromRoute] Guid folderId, CancellationToken ct)
+    {
+        var result = await _mediator.Send(new GetFolderByIdRequestDto
+        {
+            FolderId = folderId
+        }, ct);
+
+        return result;
+    }
+
     [HttpGet("get-all-folders/{courseModuleId}")]
     [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
-    public async Task<GetFolderResponseDto> GetFolder([FromRoute] Guid courseModuleId)
+    public async Task<GetFolderResponseDto> GetFolders([FromRoute] Guid courseModuleId)
     {
         var folders = await _mediator.Send(new GetFolderRequestDto
         {

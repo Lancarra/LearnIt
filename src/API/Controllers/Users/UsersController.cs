@@ -11,6 +11,7 @@ using Azure;
 using Azure.Core;
 using Infrastructure.BlobStorage.Service;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -23,17 +24,19 @@ public class UsersController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IBlobService _blobService;
-    public UsersController(IMediator mediator,IBlobService blobService)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    public UsersController(IMediator mediator,IBlobService blobService, IHttpContextAccessor httpContextAccessor)
     {
         _mediator = mediator;
         _blobService = blobService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     [Authorize]
-    [HttpGet("get-user-by-id/{userId:int}")]
-    public async Task<GetUserResponseDto> Get([FromRoute] int userId)
+    [HttpGet("get-user")]
+    public async Task<GetUserResponseDto> Get()
     {
-        var user = await _mediator.Send(new GetUserRequestDto { UserId = userId });
+        var user = await _mediator.Send(new GetUserRequestDto { UserId = 0 });
         return user;
     }
     
@@ -55,7 +58,16 @@ public class UsersController : ControllerBase
     {
         return await _mediator.Send(request);
     }
-
+    
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
+    {
+        //_httpContextAccessor.HttpContext.Session.Clear();
+        //_httpContextAccessor.HttpContext.Session.Remove("");
+        _httpContextAccessor.HttpContext.Abort();
+        return Ok(new { Success = true });
+    }
     [Authorize]
     [HttpPut("update-user")]
     public async Task<UpdateUserResponseDto> Update([FromBody] UpdateUserRequestDto request)

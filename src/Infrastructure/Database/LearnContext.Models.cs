@@ -1,5 +1,6 @@
 ﻿using Domain;
 using Domain.Models;
+using Domain.Models.Quiz;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database;
@@ -72,5 +73,38 @@ public partial class LearnContext
                 r.HasMany(u => u.Users);
             });
             
+        modelBuilder.Entity<TestCard>(tc =>
+        {
+            tc.HasKey(k => k.Id);
+            tc.HasMany(u => u.TestUnits)
+                .WithOne(u => u.TestCard)
+                .HasForeignKey(u => u.TestCardId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+        
+        modelBuilder.Entity<TestUnit>()
+            .HasOne(tc => tc.TestCard)
+            .WithMany(r => r.TestUnits)
+            .HasForeignKey(ur => ur.TestCardId).OnDelete(DeleteBehavior.NoAction);
+        
+        modelBuilder.Entity<TestCardAnswer>(tc =>
+        {
+            tc.HasKey(k => k.Id);
+            tc.HasMany(u => u.TestUnitAnswers)
+                .WithOne(u => u.TestCardAnswer)
+                .HasForeignKey(u => u.TestCardAnswerId)
+                .OnDelete(DeleteBehavior.Cascade);
+            tc.HasOne<TestCard>(tca => tca.TestCard);
+        });
+        
+        modelBuilder.Entity<TestUnitAnswers>(tua =>
+        {
+            tua.HasKey(k => k.Id);
+            tua.HasOne(u => u.TestCardAnswer)
+                .WithMany(u => u.TestUnitAnswers)
+                .HasForeignKey(u => u.TestCardAnswerId)
+                .OnDelete(DeleteBehavior.Cascade);
+            tua.HasOne<TestUnit>(tca => tca.TestUnit);
+        });
     }
 }

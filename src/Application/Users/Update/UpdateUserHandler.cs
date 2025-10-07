@@ -28,7 +28,7 @@ public class UpdateUserHandler : IRequestHandler<UpdateUserRequestDto, UpdateUse
     public async Task<UpdateUserResponseDto> Handle(UpdateUserRequestDto message, CancellationToken cancellationToken)
     {
         var currentEmail = _currentUserAccessor.GetCurrentEmail();
-        var user = await _context.Users.Where(x => x.Email == currentEmail && !x.IsDeleted).FirstOrDefaultAsync(cancellationToken);
+        var user = await _context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).Where(x => x.Email == currentEmail && !x.IsDeleted).FirstOrDefaultAsync(cancellationToken);
         user.Email = message.Email ?? user.Email;
         user.Username = message.Username ?? user.Username;
 
@@ -44,13 +44,17 @@ public class UpdateUserHandler : IRequestHandler<UpdateUserRequestDto, UpdateUse
             user.Salt = salt;
         }
         TFAHelper.TwoFactorAuthentication(user, message.GoogleAuthCode);
-
-
-
+        
         _context.Users.Update(user);
         await _context.SaveChangesAsync(cancellationToken);
 
-        var userToken = await _jwtTokenGenerator.CreateToken(user.Email, 120);
+        var roles = string.Empty;
+        foreach (var role in user.UserRoles)
+        {
+            roles += role.Role.RoleName + ", ";    
+        }
+        
+        var userToken = await _jwtTokenGenerator.CreateToken(user.Email,roles, 120);
         var token = new JwtSecurityTokenHandler().ReadJwtToken(userToken);
 
         return new UpdateUserResponseDto()

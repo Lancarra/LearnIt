@@ -2,6 +2,6 @@
 {
     public interface IJwtTokenGenerator
     {
-        Task<string> CreateToken(string email, int expiresAfterMinutes);
+        Task<string> CreateToken(string email, string roles, int expiresAfterMinutes);
     }
 }

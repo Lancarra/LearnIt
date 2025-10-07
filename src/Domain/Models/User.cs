@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using Domain.Models;
+using Domain.Models.Quiz;
 
 namespace Domain
 {
@@ -15,6 +16,7 @@ namespace Domain
         public string Email { get; set; }
 
         public Guid? BlobId { get; set; }
+        public int? TeacherId { get; set; }
 
         [JsonIgnore] public byte[] Hash { get; set; }
 
@@ -33,6 +35,6 @@ namespace Domain
         public virtual Achievement? Achievement { get; set; }
         public int? AchievementId { get; set; }
         public int Rating { get; set; }
-
+        public virtual ICollection<TestCardAnswer> TestCardAnswer { get; set; }
     }
 }

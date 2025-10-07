@@ -1,7 +1,9 @@
-﻿using Application.Folder.Get;
+﻿using System.Net;
+using Application.Folder.Get;
 using Application.Folder.GetAll;
 using Infrastructure.CurrentUserAccessor;
 using Infrastructure.Database;
+using Infrastructure.Errors;
 using Infrastructure.Helpers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -25,8 +27,14 @@ public class GetFolderHandler : IRequestHandler<GetFolderRequestDto, GetFolderRe
     {
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Email == _userAccessor.GetCurrentEmail(), cancellationToken);
+        var roles = _userAccessor.GetCurrentRoles();
         PropertyChecker.CheckNullAndThrow404(user);
-
+        PropertyChecker.CheckNullAndThrow404(roles);
+        
+        if (!roles.Contains("Admin") && !roles.Contains("Teacher") && !roles.Contains("Student"))
+        {
+            throw new RestException(HttpStatusCode.Unauthorized, new {Message = "You are haven't permission to perform this action"});
+        }
         var folders = await _context.Folders
             .Include(f => f.CourseModule)
             .Where(f => f.CourseModuleId == request.CourseModuleId && f.CourseModule.UserId == user.UserId)

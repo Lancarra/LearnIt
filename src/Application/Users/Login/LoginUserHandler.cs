@@ -34,7 +34,7 @@ namespace Application.Users.Login
 
         public async Task<LoginUserResponseDto> Handle(LoginUserRequestDto message, CancellationToken cancellationToken)
         {
-            var user = await _context.Users.Where(x => x.Email.Equals(message.Email) && !x.IsDeleted).FirstOrDefaultAsync(cancellationToken);
+            var user = await _context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).Where(x => x.Email.Equals(message.Email) && !x.IsDeleted).FirstOrDefaultAsync(cancellationToken);
             if (user == null && !message.FromOtherService)
             {
                 throw new RestException(HttpStatusCode.Unauthorized, new { Error = "Invalid email / password." });
@@ -74,7 +74,7 @@ namespace Application.Users.Login
                 }
                 else
                 {
-                    client.BaseAddress = new Uri(_configuration["LearnItBackendUrl"] ?? "http://localhost:5000/");
+                    client.BaseAddress = new Uri(_configuration["LearnItBackendUrl"] ?? "https://localhost:7271/");
                 }
 
                 client.DefaultRequestHeaders.Accept.Clear();
@@ -94,7 +94,7 @@ namespace Application.Users.Login
                 try
                 {
                     HttpResponseMessage response = await client.PostAsJsonAsync(
-                        "users/login",
+                        "https://localhost:7271/users/login",
                         loginRequest,
                         cancellationToken);
                     if (response.IsSuccessStatusCode)
@@ -113,7 +113,12 @@ namespace Application.Users.Login
 
             }
 
-            var userToken = await _jwtTokenGenerator.CreateToken(user.Email, 120);
+            var roles = string.Empty;
+            foreach (var role in user.UserRoles)
+            {
+                roles += role.Role.RoleName + ";";
+            }
+            var userToken = await _jwtTokenGenerator.CreateToken(user.Email, roles, 120);
             var token = new JwtSecurityTokenHandler().ReadJwtToken(userToken);
 
             return new LoginUserResponseDto()
@@ -121,6 +126,7 @@ namespace Application.Users.Login
                 UserId = user.UserId,
                 Email = user.Email,
                 Token = userToken,
+                UserName = user.Username,
                 LearnItToken = LearnItToken,
                 TokenValidTo = token.ValidTo,
                 Has2FAuthEnabled = user.IsGoogleAuthEnabled,

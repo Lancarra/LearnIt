@@ -18,6 +18,11 @@ public class CreateModuleHandler : IRequestHandler<CreateModuleRequestDto, Creat
         _context = context;
     }
 
+    public CreateModuleHandler(LearnContext context)
+    {
+        _context = context;
+    }
+
     public async Task<CreateModuleResponseDto> Handle(CreateModuleRequestDto request, CancellationToken cancellationToken)
     {
         if (await _context.CourseModules.Where(cm => cm.Name == request.Name).AnyAsync(cancellationToken))
@@ -38,7 +43,7 @@ public class CreateModuleHandler : IRequestHandler<CreateModuleRequestDto, Creat
         {
             Id = entity.Entity.Id,
             Name = entity.Entity.Name,
-            //UserId = entity.Entity.UserId
+            UserId = entity.Entity.UserId
         };
     }
 }

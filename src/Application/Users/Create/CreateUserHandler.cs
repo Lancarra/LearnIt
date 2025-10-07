@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Application.Users.Login;
 using Domain;
 using Infrastructure.Database;
 using Infrastructure.Errors;
@@ -41,10 +42,16 @@ public class CreateUserHandler : IRequestHandler<CreateUserRequestDto, CreateUse
             _context.Users.Add(person);
             await _context.SaveChangesAsync(cancellationToken);
 
+            var loginResponse = await _mediator.Send(new LoginUserRequestDto
+            {
+                Email = person.Email,
+                Password = request.Password,
+            });
             return new CreateUserResponseDto()
             {
                 UserId = person.UserId,
                 //BlobId = request.BlobId,
+                Response = loginResponse
             };
         }
     }

@@ -10,7 +10,7 @@ namespace Application.Users.Login
 
         public string Token { get; set; }
         public string LearnItToken { get; set; }
-
+        public string UserName { get; set; }
         public DateTime TokenValidTo { get; set; }
         public bool Has2FAuthEnabled { get; set; }
         public Guid? BlobId { get; set; }

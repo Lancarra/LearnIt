@@ -4,6 +4,8 @@ using Infrastructure.BlobStorage.Service;
 using Infrastructure.CurrentUserAccessor;
 using Infrastructure.Database;
 using Infrastructure.Security;
+using Infrastructure.Quiz;
+using Infrastructure.Quiz.AnswersResultBuilder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +23,8 @@ public static class InfrastructureServiceExtension
               services.AddScoped<IPasswordHasher, PasswordHasher>();
               services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
               services.TryAddScoped<ICurrentUserAccessor, CurrentUserAccessor.CurrentUserAccessor>();
-
+              services.AddScoped<ITestingBuilder, TestingBuilder>();
+              services.AddScoped<IResultBuilder,  ResultBuilder>();
 
               var blobSettings = configuration.GetSection("BlobSettings");
               var credential = new StorageSharedKeyCredential(blobSettings["AccountName"], blobSettings["AccountKey"]);

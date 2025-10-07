@@ -16,7 +16,7 @@ namespace API
             var signingKey = new SymmetricSecurityKey("egfwgtw4r32r2te5rty35241234f24ty3413e31qfwreg354yt34t13fw4ege5h34t2fq3vw4g234r23qrw4fgwrw"u8.ToArray());
             var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
             var issuer = "LearnIt";
-            var audience = "Teacher";
+            var audience = "LearnIt";
 
             services.Configure<JwtIssuerOptions>(options =>
             {

@@ -3,5 +3,6 @@
     public interface ICurrentUserAccessor
     {
         string? GetCurrentEmail();
+        string? GetCurrentRoles();
     }
 }

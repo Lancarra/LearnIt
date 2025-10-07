@@ -13,12 +13,13 @@ namespace Infrastructure.Security
             _jwtOptions = jwtOptions.Value;
         }
 
-        public async Task<string> CreateToken(string email, int expiresAfterMinutes)
+        public async Task<string> CreateToken(string email, string roles, int expiresAfterMinutes)
         {
             _jwtOptions.ValidFor = TimeSpan.FromMinutes(expiresAfterMinutes);
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Email, email),
+                new Claim(JwtRegisteredClaimNames.Actort, roles),
                 new Claim(JwtRegisteredClaimNames.Jti, await _jwtOptions.JtiGenerator()),
                 new Claim(JwtRegisteredClaimNames.Iat,
                     new DateTimeOffset(_jwtOptions.IssuedAt).ToUnixTimeSeconds().ToString(),

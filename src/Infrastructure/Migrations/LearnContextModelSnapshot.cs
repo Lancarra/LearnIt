@@ -71,6 +71,9 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("DictionaryId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Meaning")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -165,6 +168,52 @@ namespace Infrastructure.Migrations
                     b.ToTable("LogEvents");
                 });
 
+            modelBuilder.Entity("Domain.Models.Quiz.TestCardAnswer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TestCardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TestCardId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TestCardAnswer");
+                });
+
+            modelBuilder.Entity("Domain.Models.Quiz.TestUnitAnswers", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Answer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("TestCardAnswerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TestUnitId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TestCardAnswerId");
+
+                    b.HasIndex("TestUnitId");
+
+                    b.ToTable("TestUnitAnswers");
+                });
+
             modelBuilder.Entity("Domain.Models.Role", b =>
                 {
                     b.Property<int>("RoleId")
@@ -183,6 +232,47 @@ namespace Infrastructure.Migrations
                     b.HasKey("RoleId");
 
                     b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("Domain.Models.TestCard", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TestCards");
+                });
+
+            modelBuilder.Entity("Domain.Models.TestUnit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AdditionalAnswers")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("DefinitionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TestCardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DefinitionId");
+
+                    b.HasIndex("TestCardId");
+
+                    b.ToTable("TestUnits");
                 });
 
             modelBuilder.Entity("Domain.Models.UserRole", b =>
@@ -237,6 +327,9 @@ namespace Infrastructure.Migrations
                     b.Property<byte[]>("Salt")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
+
+                    b.Property<int?>("TeacherId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -293,6 +386,74 @@ namespace Infrastructure.Migrations
                     b.Navigation("ParentFolder");
                 });
 
+            modelBuilder.Entity("Domain.Models.Quiz.TestCardAnswer", b =>
+                {
+                    b.HasOne("Domain.Models.TestCard", "TestCard")
+                        .WithMany("TestCardAnswers")
+                        .HasForeignKey("TestCardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.User", "User")
+                        .WithMany("TestCardAnswer")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TestCard");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Models.Quiz.TestUnitAnswers", b =>
+                {
+                    b.HasOne("Domain.Models.Quiz.TestCardAnswer", "TestCardAnswer")
+                        .WithMany("TestUnitAnswers")
+                        .HasForeignKey("TestCardAnswerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Models.TestUnit", "TestUnit")
+                        .WithMany("TestUnitAnswers")
+                        .HasForeignKey("TestUnitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TestCardAnswer");
+
+                    b.Navigation("TestUnit");
+                });
+
+            modelBuilder.Entity("Domain.Models.TestCard", b =>
+                {
+                    b.HasOne("Domain.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Models.TestUnit", b =>
+                {
+                    b.HasOne("Domain.Models.Definition", "Definition")
+                        .WithMany()
+                        .HasForeignKey("DefinitionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Models.TestCard", "TestCard")
+                        .WithMany("TestUnits")
+                        .HasForeignKey("TestCardId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Definition");
+
+                    b.Navigation("TestCard");
+                });
+
             modelBuilder.Entity("Domain.Models.UserRole", b =>
                 {
                     b.HasOne("Domain.Models.Role", "Role")
@@ -341,14 +502,33 @@ namespace Infrastructure.Migrations
                     b.Navigation("Definitions");
                 });
 
+            modelBuilder.Entity("Domain.Models.Quiz.TestCardAnswer", b =>
+                {
+                    b.Navigation("TestUnitAnswers");
+                });
+
             modelBuilder.Entity("Domain.Models.Role", b =>
                 {
                     b.Navigation("UserRoles");
                 });
 
+            modelBuilder.Entity("Domain.Models.TestCard", b =>
+                {
+                    b.Navigation("TestCardAnswers");
+
+                    b.Navigation("TestUnits");
+                });
+
+            modelBuilder.Entity("Domain.Models.TestUnit", b =>
+                {
+                    b.Navigation("TestUnitAnswers");
+                });
+
             modelBuilder.Entity("Domain.User", b =>
                 {
                     b.Navigation("CourseModules");
+
+                    b.Navigation("TestCardAnswer");
 
                     b.Navigation("UserRoles");
                 });
