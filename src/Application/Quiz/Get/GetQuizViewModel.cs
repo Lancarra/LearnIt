@@ -4,6 +4,7 @@ public class GetQuizViewModel
 {
     public Guid TestUnitId { get; set; }
     public List<string> AdditionalAnswers { get; set; } = new();
+    public Guid DictionaryId { get; set; }
     public Guid DefinitionId { get; set; }
     public Guid TestCardId { get; set; }
 }

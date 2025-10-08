@@ -44,6 +44,7 @@ public class GetQuizHandler : IRequestHandler<GetQuizRequestDto, GetQuizResponse
             {
                 TestUnitId = u.Id,
                 AdditionalAnswers = Shuffle(u.AdditionalAnswers),
+                DictionaryId = u.DictionaryId ,
                 DefinitionId = u.DefinitionId,
                 TestCardId = u.TestCardId
             });
