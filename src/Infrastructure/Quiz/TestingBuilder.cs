@@ -16,7 +16,7 @@ public class TestingBuilder : ITestingBuilder
         _context = context;
         _userAccessor = userAccessor;
     }
-    public async Task<TestCard> CreateQuiz(List<TestUnitRequestDto> request, CancellationToken cancellationToken)
+    public async Task<TestCard> CreateQuiz(string name, List<TestUnitRequestDto> request, CancellationToken cancellationToken)
     {
         var tesUnits = new List<TestUnit>();
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == _userAccessor.GetCurrentEmail(), cancellationToken);
@@ -24,16 +24,19 @@ public class TestingBuilder : ITestingBuilder
         var testCard = new TestCard();
         testCard.User = user;
         testCard.UserId = user.UserId;
-        
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            testCard.Name = name;
+        }
         var definitions = await _context.Definitions.Where(d => d.DictionaryId == request.First().DictionaryId).ToListAsync(cancellationToken);
         var maxDistractors = Math.Min(3, definitions.Count - 1);
-        
+        testCard.DictionaryId = definitions.First().DictionaryId;
         foreach (var requestUnit in request)
         {
             var result = definitions.FirstOrDefault(d => d.Id == requestUnit.DefinitionId);
             if (result != null)
             {
-                var AdditionalMeaning = new List<string>();//TODO get random meaning from definitions collection
+                var AdditionalMeaning = new List<string>();
                 AdditionalMeaning.Add(result.Meaning);
                 
                 if (definitions.Count > 1)
@@ -62,13 +65,16 @@ public class TestingBuilder : ITestingBuilder
         return testCard;
     }
 
-    public async Task<TestCard> UpdateQuiz(Guid cardId, List<UpdateTestUnitViewModel> testUnits, CancellationToken cancellationToken)
+    public async Task<TestCard> UpdateQuiz(Guid cardId, string name, List<UpdateTestUnitViewModel> testUnits, CancellationToken cancellationToken)
     {
         var card = await _context.TestCards.Include(tc => tc.TestUnits).FirstOrDefaultAsync(c => c.Id == cardId, cancellationToken);
         PropertyChecker.CheckNullAndThrow404(card);
         if (testUnits.Count == 0)
             return card;
-        
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            card.Name = name;
+        }
         var dtoById = testUnits.ToDictionary(t => t.Id);
         foreach (var unit in card.TestUnits)
         {

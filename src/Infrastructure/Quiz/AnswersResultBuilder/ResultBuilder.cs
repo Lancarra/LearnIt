@@ -29,7 +29,7 @@ public class ResultBuilder : IResultBuilder
             .FirstOrDefaultAsync(ca => ca.Id == request.CardAnswerId, cancellationToken);
         PropertyChecker.CheckNullAndThrow404(testCardAnswer);
         
-        var testCardUnits = testCard.TestCardAnswers.Count();
+        var testCardUnits = testCard.TestUnits.Count();
         incorrectAnswer = testCardUnits - testCardAnswer.TestUnitAnswers.Count();
 
         var achievements = await _context.Achievements.ToListAsync(cancellationToken);
@@ -66,7 +66,6 @@ public class ResultBuilder : IResultBuilder
 
         var result = new ResultBuilderModel
         {
-            Id = Guid.NewGuid(),
             CorrectAnswers = correctAnswer,
             IncorrectAnswers = incorrectAnswer,
             CardId = request.CardId,

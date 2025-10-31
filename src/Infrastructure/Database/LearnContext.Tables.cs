@@ -18,6 +18,7 @@ public partial class LearnContext
     public virtual DbSet<TestUnitAnswers> TestUnitAnswers { get; set; }
     public virtual DbSet<LogEvent> LogEvents { get; set; }
     public virtual DbSet<Role> Roles { get; set; }
+    public virtual DbSet<StaticImages> StaticImages { get; set; }
     
     public virtual DbSet<Achievement> Achievements { get; set; }
     public virtual DbSet<UserRole> UserRole { get; set; }

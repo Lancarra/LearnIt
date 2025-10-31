@@ -58,16 +58,15 @@ public class UsersController : ControllerBase
     {
         return await _mediator.Send(request);
     }
-    
     [Authorize]
-    [HttpPost("logout")]
-    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
+    [HttpPost("logout/{userId:int}")]
+    public async Task<IActionResult> Logout([FromRoute] int userId, CancellationToken cancellationToken)
     {
-        //_httpContextAccessor.HttpContext.Session.Clear();
-        //_httpContextAccessor.HttpContext.Session.Remove("");
-        _httpContextAccessor.HttpContext.Abort();
+        _httpContextAccessor.HttpContext.Session.Remove(userId.ToString());
+        _httpContextAccessor.HttpContext?.Abort();
         return Ok(new { Success = true });
     }
+    
     [Authorize]
     [HttpPut("update-user")]
     public async Task<UpdateUserResponseDto> Update([FromBody] UpdateUserRequestDto request)
@@ -108,7 +107,7 @@ public class UsersController : ControllerBase
     }
 
     [Authorize]
-    [HttpPut("blob/get/{fileBlobId:guid}")]
+    [HttpGet("blob/get/{fileBlobId:guid}")]
     public async Task<IActionResult> DownloadFileBlob(Guid fileBlobId)
     {
         try

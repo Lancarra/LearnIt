@@ -47,7 +47,7 @@ public class CreateQuizAnswerHandler: IRequestHandler<CreateQuizAnswerRequestDto
         }
         cardAnswer.TestUnitAnswers = answers;
         
-        await _context.TestCardAnswer.AddAsync(cardAnswer, cancellationToken);
+        var answerCard = await _context.TestCardAnswer.AddAsync(cardAnswer, cancellationToken);
         await _context.TestUnitAnswers.AddRangeAsync(answers, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
@@ -57,6 +57,7 @@ public class CreateQuizAnswerHandler: IRequestHandler<CreateQuizAnswerRequestDto
             CardAnswerId = cardAnswer.Id
         };
         var result = await _builder.GetQuizResult(checkRequest, cancellationToken );
+        result.TestCardAnswerId = answerCard.Entity.Id;
         var response = new CreateQuizAnswerResponseDto()
         {
             Result = result

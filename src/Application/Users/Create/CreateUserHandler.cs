@@ -1,8 +1,10 @@
 ﻿using System.Net;
 using Application.Users.Login;
 using Domain;
+using Domain.Models;
 using Infrastructure.Database;
 using Infrastructure.Errors;
+using Infrastructure.Helpers;
 using Infrastructure.Security;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +30,8 @@ public class CreateUserHandler : IRequestHandler<CreateUserRequestDto, CreateUse
         {
             throw new RestException(HttpStatusCode.BadRequest, new {Email = $"User with email {request.Email} already exists"});
         }
-
+        var role = await _context.Roles.FirstOrDefaultAsync(r => r.RoleName == request.RoleName, cancellationToken);
+        PropertyChecker.CheckNullAndThrow404(role);
         var salt = Guid.NewGuid().ToByteArray();
         {
             var person = new User()
@@ -39,14 +42,22 @@ public class CreateUserHandler : IRequestHandler<CreateUserRequestDto, CreateUse
                 Salt = salt,
                 //BlobId = request.BlobId,
             };
-            _context.Users.Add(person);
+            var personEntity = await _context.Users.AddAsync(person, cancellationToken);
+            
+            await _context.UserRole.AddAsync(new UserRole
+            {
+                UserId = personEntity.Entity.UserId,
+                User = personEntity.Entity,
+                RoleId = role.RoleId,
+                Role = role
+            }, cancellationToken);
+            
             await _context.SaveChangesAsync(cancellationToken);
-
             var loginResponse = await _mediator.Send(new LoginUserRequestDto
             {
                 Email = person.Email,
                 Password = request.Password,
-            });
+            }, cancellationToken);
             return new CreateUserResponseDto()
             {
                 UserId = person.UserId,

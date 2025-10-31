@@ -4,6 +4,7 @@ using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(LearnContext))]
-    partial class LearnContextModelSnapshot : ModelSnapshot
+    [Migration("20250903164624_AddQuizAnswer")]
+    partial class AddQuizAnswer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -234,35 +237,16 @@ namespace Infrastructure.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("Domain.Models.StaticImages", b =>
-                {
-                    b.Property<Guid>("FileBlobId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("FileBlobId");
-
-                    b.ToTable("StaticImages");
-                });
-
             modelBuilder.Entity("Domain.Models.TestCard", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("DictionaryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DictionaryId");
 
                     b.HasIndex("UserId");
 
@@ -350,9 +334,6 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("TeacherId")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("TestCardId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -360,8 +341,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("UserId");
 
                     b.HasIndex("AchievementId");
-
-                    b.HasIndex("TestCardId");
 
                     b.ToTable("Users");
                 });
@@ -450,18 +429,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Models.TestCard", b =>
                 {
-                    b.HasOne("Domain.Models.LearnWordDictionary", "Dictionary")
-                        .WithMany("TestCards")
-                        .HasForeignKey("DictionaryId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Domain.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Dictionary");
 
                     b.Navigation("User");
                 });
@@ -510,10 +482,6 @@ namespace Infrastructure.Migrations
                         .WithMany("Users")
                         .HasForeignKey("AchievementId");
 
-                    b.HasOne("Domain.Models.TestCard", null)
-                        .WithMany("AssignedUsers")
-                        .HasForeignKey("TestCardId");
-
                     b.Navigation("Achievement");
                 });
 
@@ -535,8 +503,6 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Models.LearnWordDictionary", b =>
                 {
                     b.Navigation("Definitions");
-
-                    b.Navigation("TestCards");
                 });
 
             modelBuilder.Entity("Domain.Models.Quiz.TestCardAnswer", b =>
@@ -551,8 +517,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Models.TestCard", b =>
                 {
-                    b.Navigation("AssignedUsers");
-
                     b.Navigation("TestCardAnswers");
 
                     b.Navigation("TestUnits");

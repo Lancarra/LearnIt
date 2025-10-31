@@ -20,7 +20,10 @@ namespace Infrastructure.Helpers
                 }
             }
         }
-
-
+        
+        public static void CheckRoleAndThrow403()
+        { 
+            throw new RestException(HttpStatusCode.Forbidden, new { Error = $"You don't have permission to update roles" });
+        }
     }
 }

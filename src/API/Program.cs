@@ -88,7 +88,7 @@ namespace API
 
                 var user = context.Users.SingleOrDefault(u =>
                     !u.IsDeleted && u.Email == "admin");
-                var userPass = config.GetValue<string>("TestPassword");
+                var userPass = config.GetValue<string>("admin");
                 if (user == null && mediator != null && passwordHasher != null && userPass != null)
                 {
                     var salt = Guid.NewGuid().ToByteArray();

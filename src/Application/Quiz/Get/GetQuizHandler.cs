@@ -24,7 +24,7 @@ public class GetQuizHandler : IRequestHandler<GetQuizRequestDto, GetQuizResponse
         var roles = _userAccessor.GetCurrentRoles();
         PropertyChecker.CheckNullAndThrow404(roles);
         
-        if (!roles.Contains("Admin") && !roles.Contains("Teacher"))
+        if (!roles.Contains("Admin") && !roles.Contains("Teacher") && !roles.Contains("Student"))
         {
             throw new RestException(HttpStatusCode.Unauthorized, new {Message = "You are haven't permission to perform this action"});
         }

@@ -76,6 +76,10 @@ public partial class LearnContext
         modelBuilder.Entity<TestCard>(tc =>
         {
             tc.HasKey(k => k.Id);
+            tc.HasOne(q => q.Dictionary)
+                .WithMany(d => d.TestCards)
+                .HasForeignKey(k =>  k.DictionaryId)
+                .OnDelete(DeleteBehavior.NoAction);
             tc.HasMany(u => u.TestUnits)
                 .WithOne(u => u.TestCard)
                 .HasForeignKey(u => u.TestCardId)
@@ -105,6 +109,11 @@ public partial class LearnContext
                 .HasForeignKey(u => u.TestCardAnswerId)
                 .OnDelete(DeleteBehavior.Cascade);
             tua.HasOne<TestUnit>(tca => tca.TestUnit);
+        });
+        
+        modelBuilder.Entity<StaticImages>(si =>
+        {
+            si.HasKey(k => k.FileBlobId);
         });
     }
 }

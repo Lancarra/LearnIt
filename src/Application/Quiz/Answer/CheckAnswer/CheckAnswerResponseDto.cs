@@ -4,5 +4,7 @@ namespace Application.Quiz.Answer.CheckAnswer;
 
 public class CheckAnswerResponseDto
 {
-    public ResultBuilderModel  Result { get; set; }
+    public int CorrectAnswers { get; set; }
+    public int IncorrectAnswers { get; set; }
+    public string AchievementDescription {get;set;}
 }

@@ -6,6 +6,7 @@ using Infrastructure.Errors;
 using Infrastructure.Helpers;
 using Infrastructure.Security;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Users.UpdatePermission;
@@ -36,7 +37,8 @@ public class UpdatePermissionHandler : IRequestHandler<UpdatePermissionRequestDt
         
         if (!isAdmin)
         {
-            throw new UnauthorizedAccessException("You don't have permission to update roles");       
+            PropertyChecker.CheckRoleAndThrow403();
+            //throw new UnauthorizedAccessException("You don't have permission to update roles");       
         }
         #endregion
         

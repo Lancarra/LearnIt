@@ -19,9 +19,11 @@ public class CheckAnswerHandler : IRequestHandler<CheckAnswerRequestDto, CheckAn
     public async Task<CheckAnswerResponseDto> Handle(CheckAnswerRequestDto request, CancellationToken cancellationToken)
     {
         var result = await _builder.GetQuizResult(request.MapToEntity(), cancellationToken );
-        var response = new CheckAnswerResponseDto()
+        var response = new CheckAnswerResponseDto
         {
-            Result = result
+            CorrectAnswers = result.CorrectAnswers,
+            IncorrectAnswers = result.IncorrectAnswers,
+            AchievementDescription = result.AchievementDescription,
         };       
         return response;
     }

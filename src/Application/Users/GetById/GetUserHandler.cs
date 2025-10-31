@@ -25,19 +25,27 @@ using Infrastructure.Database;
      
      public async Task<GetUserResponseDto> Handle(GetUserRequestDto request, CancellationToken cancellationToken)
      {
-         
-         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == _userAccessor.GetCurrentEmail() && !u.IsDeleted, cancellationToken);
+         var user = await _context.Users.Include(u => u.Achievement)
+                                        .Include(u => u.UserRoles)
+                                        .ThenInclude(ur => ur.Role)
+                                        .FirstOrDefaultAsync(u => u.Email == _userAccessor.GetCurrentEmail() && !u.IsDeleted, cancellationToken);
          if (user == null)
          {
              throw new RestException(HttpStatusCode.NotFound, new { User = "User not found" });
          }
 
+         var roles = string.Join(",", user.UserRoles.Select(ur => ur.Role.RoleName));
+         
          return new GetUserResponseDto
          {
              UserId = user.UserId,
              Email = user.Email,
              Username = user.Username,
              BlobId = user.BlobId,
+             RoleName = string.IsNullOrWhiteSpace(roles) ? "Empty" : roles,
+             Achievement = user.Achievement != null 
+                 ? user.Achievement.Name 
+                 : "You haven't completed a single dictionary"
          };
      }
  }

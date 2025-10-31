@@ -8,6 +8,7 @@ namespace Application.Users.Create
 
         public string Password { get; set; }
         public string Username { get; set; }
+        public string RoleName { get; set; }
         //public Guid? BlobId { get; set; }
     }
 }
