@@ -16,6 +16,14 @@ public partial class LearnContext
             m.HasMany(x => x.Folders)
                 .WithOne(x => x.CourseModule)
                 .HasForeignKey(x => x.CourseModuleId);
+            m.HasOne(cm => cm.User)
+                .WithMany(u => u.OwnedCourseModules)
+                .HasForeignKey(cm => cm.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+            
+            m.HasMany(cm => cm.Students)
+                .WithMany(u => u.StudentCourseModules)
+                .UsingEntity(j => j.ToTable("CourseModuleStudents"));
         });
         
         modelBuilder.Entity<Folder>(m =>
@@ -114,6 +122,11 @@ public partial class LearnContext
         modelBuilder.Entity<StaticImages>(si =>
         {
             si.HasKey(k => k.FileBlobId);
+        });
+        
+        modelBuilder.Entity<PermissionRequest>(pr =>
+        {
+            pr.HasKey(k => k.RequestId);
         });
     }
 }

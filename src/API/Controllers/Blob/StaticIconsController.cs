@@ -1,3 +1,4 @@
+using API.Controllers.Users.Constants;
 using Domain.Models.Attachment;
 using Infrastructure.BlobStorage.Service;
 using Microsoft.AspNetCore.Authorization;
@@ -47,6 +48,25 @@ public class StaticIconsController : ControllerBase
         }
         catch (Exception exception)
         {
+            return BadRequest(exception.Message);
+        }
+    }
+    
+    [HttpPost("blob/upload/")]
+    public async Task<IActionResult> UpdateDocumentFile( IFormFile file)
+    {
+        Guid blobId = Guid.Empty;
+
+        try
+        {
+            await using var stream = file.OpenReadStream(); 
+            blobId = await _blobService.UploadAsync(stream, file.ContentType, Constants.STATIC_ICON_CONTAINER);
+            
+            return Ok(blobId);
+        }
+        catch (Exception exception)
+        {
+            await _blobService.DeleteAsync(blobId, Constants.STATIC_ICON_CONTAINER);
             return BadRequest(exception.Message);
         }
     }

@@ -34,7 +34,9 @@ public class CreateModuleHandler : IRequestHandler<CreateModuleRequestDto, Creat
         { 
             Id = Guid.NewGuid(),
             Name = request.Name,
-            UserId = request.UserId
+            UserId = request.UserId,
+            Description = request.Description,
+            LearnLevel = request.LearnLevel,
         };
         var entity = await _context.CourseModules.AddAsync(courseModule, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
@@ -43,7 +45,9 @@ public class CreateModuleHandler : IRequestHandler<CreateModuleRequestDto, Creat
         {
             Id = entity.Entity.Id,
             Name = entity.Entity.Name,
-            UserId = entity.Entity.UserId
+            UserId = entity.Entity.UserId,
+            Description = entity.Entity.Description,
+            LearnLevel = entity.Entity.LearnLevel,
         };
     }
 }

@@ -41,6 +41,6 @@ public class GetDefinitionHandler : IRequestHandler<GetDefinitionRequestDto, Get
             };
                 definitionsResponse.Add(definitionResponse);
         }
-        return new GetDefinitionResponseDto(definitionsResponse);
+        return new GetDefinitionResponseDto(definitionsResponse, definitionsResponse.Count);
     }
 }

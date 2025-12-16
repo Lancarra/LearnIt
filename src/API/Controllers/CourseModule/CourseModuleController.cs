@@ -1,6 +1,7 @@
 ﻿using Application.CourseModule.Create;
 using Application.CourseModule.Delete;
 using Application.CourseModule.GetAll;
+using Application.CourseModule.GetByTeacherId;
 using Application.CourseModule.Update;
 using Infrastructure.Security;
 using MediatR;
@@ -20,13 +21,21 @@ public class CourseModuleController: ControllerBase
         _mediator = mediator;
     }
     
-    [HttpGet("")]
-    
+
+
     [HttpGet("get-all-modules")]
     [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
     public async Task<GetModuleResponseDto> GetModule()
     {
         var modules = await _mediator.Send(new GetModuleRequestDto());;
+        return modules;
+    }
+    
+    [HttpGet("get-by-teacher-id-modules/{teacherId:int}")]
+    [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
+    public async Task<GetByTeacherIdResponseDto> GetByTeacherIdModule([FromRoute] int teacherId)
+    {
+        var modules = await _mediator.Send(new GetByTeacherIdRequestDto(){TeacherId = teacherId});
         return modules;
     }
     

@@ -33,6 +33,7 @@ public class CreateUserHandler : IRequestHandler<CreateUserRequestDto, CreateUse
         var role = await _context.Roles.FirstOrDefaultAsync(r => r.RoleName == request.RoleName, cancellationToken);
         PropertyChecker.CheckNullAndThrow404(role);
         var salt = Guid.NewGuid().ToByteArray();
+        try
         {
             var person = new User()
             {
@@ -40,30 +41,36 @@ public class CreateUserHandler : IRequestHandler<CreateUserRequestDto, CreateUse
                 Username = request.Username,
                 Hash = _passwordHasher.Hash(request.Password, salt),
                 Salt = salt,
-                //BlobId = request.BlobId,
+                //BlobId = request.BlobId,111111
             };
-            var personEntity = await _context.Users.AddAsync(person, cancellationToken);
-            
-            await _context.UserRole.AddAsync(new UserRole
-            {
-                UserId = personEntity.Entity.UserId,
-                User = personEntity.Entity,
-                RoleId = role.RoleId,
-                Role = role
-            }, cancellationToken);
-            
+            await _context.Users.AddAsync(person, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-            var loginResponse = await _mediator.Send(new LoginUserRequestDto
-            {
-                Email = person.Email,
-                Password = request.Password,
-            }, cancellationToken);
-            return new CreateUserResponseDto()
-            {
-                UserId = person.UserId,
-                //BlobId = request.BlobId,
-                Response = loginResponse
-            };
         }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+        var personCreated = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken); 
+        await _context.UserRole.AddAsync(new UserRole
+        {
+            UserId = personCreated.UserId,
+            User = personCreated,
+            RoleId = role.RoleId,
+            Role = role
+        }, cancellationToken);
+            
+        await _context.SaveChangesAsync(cancellationToken);
+        var loginResponse = await _mediator.Send(new LoginUserRequestDto
+        {
+            Email = personCreated.Email,
+            Password = request.Password,
+        }, cancellationToken);
+        return new CreateUserResponseDto()
+        {
+            UserId = personCreated.UserId,
+            RoleName = role.RoleName,
+            Response = loginResponse
+        };
     }
 }

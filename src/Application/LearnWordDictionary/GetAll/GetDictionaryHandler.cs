@@ -38,6 +38,6 @@ public class GetDictionaryHandler : IRequestHandler<GetDictionaryRequestDto, Get
             };
             dictionariesResponse.Add(dictionaryResponse);
         }
-        return new GetDictionaryResponseDto(dictionariesResponse);
+        return new GetDictionaryResponseDto(dictionariesResponse, dictionaries.Count);
     }
 }

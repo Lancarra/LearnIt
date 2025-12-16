@@ -22,24 +22,93 @@ public class GetModuleHandler : IRequestHandler<GetModuleRequestDto, GetModuleRe
 
     public async Task<GetModuleResponseDto> Handle(GetModuleRequestDto request, CancellationToken cancellationToken)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == _userAccessor.GetCurrentEmail(), cancellationToken);
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == _userAccessor.GetCurrentEmail(),
+            cancellationToken);
         PropertyChecker.CheckNullAndThrow404(user);
-        
-        var modules = await _context.CourseModules.Where(cm => cm.UserId == user.UserId).ToListAsync(cancellationToken);
-        PropertyChecker.CheckNullAndThrow404(modules);
-        
-        var modulesResponse = new List<GetModuleViewModel>();
-        foreach (var module in modules)
+
+        var role = _userAccessor.GetCurrentRoles();
+        if (role.Contains("Student"))
         {
-            var moduleResponse = new GetModuleViewModel()
+            var studentModules = await _context.CourseModules.Where(cm => cm.Students.Contains(user))
+                .ToListAsync(cancellationToken);
+            PropertyChecker.CheckNullAndThrow404(studentModules);
+
+            var response = new List<GetModuleViewModel>();
+            foreach (var module in studentModules)
             {
-                Id = module.Id, 
-                Name = module.Name,
-                UserId = module.UserId
+                var moduleResponse = new GetModuleViewModel()
+                {
+                    Id = module.Id,
+                    Name = module.Name,
+                    UserId = module.UserId,
+                    Description = module.Description,
+                    LearnLevel = module.LearnLevel,
+                };
+                response.Add(moduleResponse);
+            }
+
+            return new GetModuleResponseDto(response)
+            {
+                Count = response.Count
             };
-            modulesResponse.Add(moduleResponse);
         }
 
-        return new GetModuleResponseDto(modulesResponse);
+        var modules = await _context.CourseModules
+                                                .Include(cm => cm.User)
+                                                .Include(cm => cm.Folders)!
+                                                .ThenInclude(f => f.Dictionaries)
+            .Select(cm => new
+            {
+                cm.Id,
+                cm.Name,
+                cm.UserId,
+                cm.Description,
+                cm.LearnLevel,
+                Author = cm.User.Username,
+                DictionaryIds = cm.Folders
+                    .SelectMany(f => f.Dictionaries.Select(d => d.Id))
+                    .ToList()
+            })
+            .ToListAsync(cancellationToken);
+
+        PropertyChecker.CheckNullAndThrow404(modules);
+
+        var allDictionaryIds = modules
+            .SelectMany(m => m.DictionaryIds)
+            .Where(id => id != null)
+            .Cast<Guid>()
+            .Distinct()
+            .ToList();
+
+        var quizCount = 0;
+        if (allDictionaryIds.Any())
+        {
+            var dictionaryIdsList = allDictionaryIds; 
+    
+            quizCount = await _context.TestCards
+                .Where(tc => dictionaryIdsList.Contains(tc.DictionaryId ?? Guid.Empty))
+                .CountAsync(cancellationToken);
+        }
+        else
+        {
+            quizCount = 0;
+        }
+
+        var modulesResponse = modules.Select(module => new GetModuleViewModel()
+        {
+            Id = module.Id,
+            Name = module.Name,
+            UserId = module.UserId,
+            Author = module.Author,
+            Description = module.Description,
+            LearnLevel = module.LearnLevel
+        }).ToList();
+
+        return new GetModuleResponseDto(modulesResponse)
+        {
+            Count = modulesResponse.Count,
+            QuizCount = quizCount,
+        };
     }
 }

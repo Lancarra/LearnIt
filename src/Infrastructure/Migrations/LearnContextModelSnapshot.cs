@@ -22,6 +22,21 @@ namespace Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CourseModuleUser", b =>
+                {
+                    b.Property<Guid>("StudentCourseModulesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("StudentsUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("StudentCourseModulesId", "StudentsUserId");
+
+                    b.HasIndex("StudentsUserId");
+
+                    b.ToTable("CourseModuleStudents", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Models.Achievement", b =>
                 {
                     b.Property<int>("Id")
@@ -44,6 +59,12 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LearnLevel")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -166,6 +187,24 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("LogEvents");
+                });
+
+            modelBuilder.Entity("Domain.Models.PermissionRequest", b =>
+                {
+                    b.Property<Guid>("RequestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("RequestUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("RequestId");
+
+                    b.ToTable("PermissionRequests");
                 });
 
             modelBuilder.Entity("Domain.Models.Quiz.TestCardAnswer", b =>
@@ -347,8 +386,13 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<int?>("TeacherId")
-                        .HasColumnType("int");
+                    b.Property<string>("StudentsId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TeachersId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("TestCardId")
                         .HasColumnType("uniqueidentifier");
@@ -366,12 +410,27 @@ namespace Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("CourseModuleUser", b =>
+                {
+                    b.HasOne("Domain.Models.CourseModule", null)
+                        .WithMany()
+                        .HasForeignKey("StudentCourseModulesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("StudentsUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Domain.Models.CourseModule", b =>
                 {
                     b.HasOne("Domain.User", "User")
-                        .WithMany("CourseModules")
+                        .WithMany("OwnedCourseModules")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -565,7 +624,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.User", b =>
                 {
-                    b.Navigation("CourseModules");
+                    b.Navigation("OwnedCourseModules");
 
                     b.Navigation("TestCardAnswer");
 

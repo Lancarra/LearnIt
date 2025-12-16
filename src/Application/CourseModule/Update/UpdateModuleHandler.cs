@@ -19,7 +19,7 @@ public class UpdateModuleHandler : IRequestHandler<UpdateModuleRequestDto, Updat
 
     public async Task<UpdateModuleResponseDto> Handle(UpdateModuleRequestDto request, CancellationToken cancellationToken)
     {
-        var courseModule = await _context.CourseModules.FirstOrDefaultAsync(cm => cm.Id == request.Id, cancellationToken);
+        var courseModule = await _context.CourseModules.Include(cm => cm.Students).FirstOrDefaultAsync(cm => cm.Id == request.Id, cancellationToken);
         if (courseModule == null)
         {
             throw new RestException(HttpStatusCode.NotFound, new {Id = $"CourseModule with id {request.Id} does not exist"});
@@ -33,6 +33,34 @@ public class UpdateModuleHandler : IRequestHandler<UpdateModuleRequestDto, Updat
             throw new RestException(HttpStatusCode.BadRequest, new {Name = $"CourseModule with name {request.Name} already exists"});
         }
 
+        if (request.StudentsAdd.Count > 0)
+        {
+            var studentsAdd = await _context.Users
+                .Where(u => request.StudentsAdd.Contains(u.UserId) && !u.IsDeleted)
+                .ToListAsync(cancellationToken);
+            if (studentsAdd.Count > 0)
+            {
+                foreach (var student in studentsAdd)
+                {
+                    courseModule.Students.Add(student);
+                }
+            }
+        }
+
+        if (request.StudentsRemove.Count > 0)
+        {
+            var studentsRemove = await _context.Users
+                .Where(u => request.StudentsRemove.Contains(u.UserId) && !u.IsDeleted)
+                .ToListAsync(cancellationToken);
+            if (studentsRemove.Count > 0)
+            {
+                foreach (var student in studentsRemove)
+                {
+                    courseModule.Students.Remove(student);
+                }
+            }
+
+        }
         courseModule.Name = request.Name;
         courseModule.UserId = request.UserId;
         await _context.SaveChangesAsync(cancellationToken);
@@ -41,7 +69,10 @@ public class UpdateModuleHandler : IRequestHandler<UpdateModuleRequestDto, Updat
         {
             Id = courseModule.Id,
             Name = courseModule.Name,
-            UserId = courseModule.UserId
+            UserId = courseModule.UserId,
+            Description = courseModule.Description,
+            LearnLevel = courseModule.LearnLevel,
+            CountStudents =  courseModule.Students.Count,
         };
     }
 }

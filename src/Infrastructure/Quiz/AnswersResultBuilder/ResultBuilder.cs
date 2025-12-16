@@ -47,8 +47,17 @@ public class ResultBuilder : IResultBuilder
                 incorrectAnswer++;
             }
         }
-
-        var achievementDescription = $"Your current level {achievements.FirstOrDefault(a => a.Id == user.AchievementId).Name} ";
+        var achievementDescription = string.Empty;
+        if (user?.AchievementId == null)
+        {
+            achievementDescription = "Your current level start";
+        }
+        else
+        { 
+            var achievementName = achievements.FirstOrDefault(a => a.Id == user?.AchievementId).Name;
+            achievementDescription = $"Your current level {achievementName}";
+        }
+        
         switch (user.Rating)
         {
             case 5:
@@ -61,7 +70,10 @@ public class ResultBuilder : IResultBuilder
            
            case 15:
                 achievementDescription = $"Your current level Professional. You are Cool ";
-               break; 
+               break;
+           default:
+                achievementDescription = $"You need passed test for getting reting";
+                break;
         }
 
         var result = new ResultBuilderModel

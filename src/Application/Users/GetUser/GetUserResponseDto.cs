@@ -1,4 +1,4 @@
-﻿namespace Application.Users.GetById;
+namespace Application.Users.GetById;
 
 public class GetUserResponseDto
 {

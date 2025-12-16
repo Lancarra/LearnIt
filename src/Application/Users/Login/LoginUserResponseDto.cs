@@ -7,12 +7,16 @@ namespace Application.Users.Login
         public int UserId { get; set; }
 
         public string Email { get; set; }
-
+        public string RoleName { get; set; }
+        public string Achievement {get; set;}
         public string Token { get; set; }
         public string LearnItToken { get; set; }
         public string UserName { get; set; }
         public DateTime TokenValidTo { get; set; }
         public bool Has2FAuthEnabled { get; set; }
         public Guid? BlobId { get; set; }
+        public List <int?> TeachersId { get; set; }
+        public List <int?> StudentsId { get; set; }
+        
     }
 }

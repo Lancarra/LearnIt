@@ -6,6 +6,7 @@ using Infrastructure.Database;
 using Infrastructure.Security;
 using Infrastructure.Quiz;
 using Infrastructure.Quiz.AnswersResultBuilder;
+using Infrastructure.Quiz.GeneralTest;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +26,7 @@ public static class InfrastructureServiceExtension
               services.TryAddScoped<ICurrentUserAccessor, CurrentUserAccessor.CurrentUserAccessor>();
               services.AddScoped<ITestingBuilder, TestingBuilder>();
               services.AddScoped<IResultBuilder,  ResultBuilder>();
+              services.AddScoped<IGeneralTest, GeneralTest>();
 
               var blobSettings = configuration.GetSection("BlobSettings");
               var credential = new StorageSharedKeyCredential(blobSettings["AccountName"], blobSettings["AccountKey"]);

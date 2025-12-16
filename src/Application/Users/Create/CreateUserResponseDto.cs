@@ -7,7 +7,7 @@ namespace Application.Users.Create
         public int UserId { get; set; }
         public Guid? BlobId { get; set; }
         public string UserName { get; set; }
-
+        public string RoleName { get; set; }
         public LoginUserResponseDto  Response { get; set; }
     }
 }

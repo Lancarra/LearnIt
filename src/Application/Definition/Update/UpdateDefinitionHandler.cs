@@ -36,9 +36,16 @@ public class UpdateDefinitionHandler : IRequestHandler<UpdateDefinitionRequestDt
         {
             throw new RestException(HttpStatusCode.BadRequest, new {Word = $"Word with name {request.Word} already exists"});
         }
-        
-        definition.Word = request.Word;
-        definition.Meaning = request.Meaning;
+
+        if (!string.IsNullOrEmpty(request.Word))
+        {
+            definition.Word = request.Word;
+        }
+
+        if (!string.IsNullOrEmpty(request.Meaning))
+        {
+            definition.Meaning = request.Meaning;
+        }
         definition.BlobId = request.BlobId;
         definition.DictionaryId = request.DictionaryId;
         definition.ImageUrl = request.ImageURL;

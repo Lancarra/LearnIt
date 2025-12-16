@@ -1,18 +1,14 @@
-﻿namespace Domain.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Domain.Models;
 
 public class Definition
 {
     public Guid Id { get; set; }
-    
     public string Word { get; set; }
-    
     public string Meaning { get; set; }
-    
     public Guid? BlobId { get; set; }
-    
     public virtual LearnWordDictionary Dictionary { get; set; }
-    
     public Guid DictionaryId { get; set;}
-    
     public virtual string? ImageUrl { get; set; }
 }

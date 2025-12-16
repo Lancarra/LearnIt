@@ -50,7 +50,7 @@ namespace Infrastructure.BlobStorage.Service
         {
             List<FileResponse> fileResponses = new List<FileResponse>();
 
-            BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetSection("BlobStaticIconsSettings")["BlobConnection"]);
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetSection("BlobSettings")["BlobConnection"]);
             BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("static-icons");
 
             await foreach (var blobItem in containerClient.GetBlobsAsync())

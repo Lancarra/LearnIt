@@ -1,10 +1,12 @@
 using Application.CourseModule.Create;
+using Application.GeneralQuiz.Create;
 using Application.Quiz;
 using Application.Quiz.Answer.CheckAnswer;
 using Application.Quiz.Answer.CheckSingleAnswer;
 using Application.Quiz.Answer.Create;
 using Application.Quiz.Get;
 using Application.Quiz.GetCards;
+using Application.Quiz.GetWithDefinitions;
 using Application.Quiz.Update;
 using Infrastructure.BlobStorage.Service;
 using Infrastructure.Security;
@@ -39,6 +41,13 @@ public class QuizController
     {
         var quiz = await _mediator.Send(new GetQuizRequestDto(){TestCardId =  cardId});
         return quiz;
+    }
+    [HttpGet("get-info/{cardId}")]
+    [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
+    public async Task<GetWithDefinitionsResponseDto> GetInfo([FromRoute] Guid cardId)
+    {
+        var info = await _mediator.Send(new GetWithDefinitionsRequestDto(){TestCardId =  cardId});
+        return info;
     }
     
     [HttpGet("get-quiz-by-dictionary-id/{dictionaryId}")]
@@ -79,5 +88,12 @@ public class QuizController
     {
         var result = await _mediator.Send(request);
         return result;
+    }
+
+    [HttpPost("create-general-quiz")] [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
+    public async Task<CreateGeneralQuizResponseDto> CreateGeneralQuiz([FromBody] CreateGeneralQuizRequestDto request)
+    {
+        var quiz = await _mediator.Send(request);
+        return quiz;
     }
 }

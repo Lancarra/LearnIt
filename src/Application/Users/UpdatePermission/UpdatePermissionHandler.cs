@@ -59,6 +59,13 @@ public class UpdatePermissionHandler : IRequestHandler<UpdatePermissionRequestDt
                 UserId = updateUser.UserId,
             };
             await _context.UserRole.AddAsync(userRole);
+
+            var permissionRequest = await _context.PermissionRequests.FirstOrDefaultAsync(pr =>
+                pr.RoleName == role.RoleName && pr.RequestUserId == request.UserId);
+            if (permissionRequest != null)
+            {
+                _context.PermissionRequests.Remove(permissionRequest);
+            }
             await _context.SaveChangesAsync(cancellationToken);
             return new UpdatePermissionResponseDto(){Result= $"Role {role.RoleName} add to user {updateUser.Username} successfully"};
         }

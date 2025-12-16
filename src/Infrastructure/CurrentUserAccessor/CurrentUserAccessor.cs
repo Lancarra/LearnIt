@@ -20,7 +20,7 @@ namespace Infrastructure.CurrentUserAccessor
         public string? GetCurrentRoles()
         {
            var roles =  _httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.Actor)?.Value;
-
+            
            return roles;
         }
     }

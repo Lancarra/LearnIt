@@ -27,7 +27,7 @@ public class GetAllTestCardByDictionaryIdHandler : IRequestHandler<GetAllTestCar
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == _userAccessor.GetCurrentEmail(), cancellationToken);
         PropertyChecker.CheckNullAndThrow404(user);
         
-        var cards = await _context.TestCards.Where(d => d.DictionaryId == request.DictionaryId).ToListAsync(cancellationToken);
+        var cards = await _context.TestCards.Include(tc => tc.User).Where(d => d.DictionaryId == request.DictionaryId).ToListAsync(cancellationToken);
         PropertyChecker.CheckNullAndThrow404(cards);
         
         foreach (var card in cards)
@@ -36,6 +36,7 @@ public class GetAllTestCardByDictionaryIdHandler : IRequestHandler<GetAllTestCar
             {
                 CardId = card.Id,
                 Name = card.Name,
+                UserName = card.User.Username
             });
         }
         return result;

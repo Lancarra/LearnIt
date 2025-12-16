@@ -63,7 +63,7 @@ public class UpdateUserHandler : IRequestHandler<UpdateUserRequestDto, UpdateUse
             Token = userToken,
             TokenValidTo = token.ValidTo,
             Username = user.Username,
-            BlobId = user.BlobId
+            BlobId = user.BlobId,
         };
     }
 }

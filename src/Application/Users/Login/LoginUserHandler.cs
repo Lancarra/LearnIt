@@ -125,12 +125,18 @@ namespace Application.Users.Login
             {
                 UserId = user.UserId,
                 Email = user.Email,
+                RoleName = string.IsNullOrWhiteSpace(roles) ? "Empty" : roles,
+                Achievement = user.Achievement != null 
+                    ? user.Achievement.Name 
+                    : "You haven't completed a single dictionary",
                 Token = userToken,
                 UserName = user.Username,
                 LearnItToken = LearnItToken,
                 TokenValidTo = token.ValidTo,
                 Has2FAuthEnabled = user.IsGoogleAuthEnabled,
                 BlobId = user.BlobId,
+                TeachersId = user.TeachersId,
+                StudentsId = user.StudentsId,
             };
         }
     }

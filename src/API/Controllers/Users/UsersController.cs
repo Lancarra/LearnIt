@@ -1,12 +1,18 @@
-﻿using Application.Users._2FaUth.CheckIfEnabled;
+﻿using Application.PermissionRequests;
+using Application.Users._2FaUth.CheckIfEnabled;
 using Application.Users.Create;
 using Application.Users.Delete;
+using Application.Users.GetAll;
+using Application.Users.GetAllStudentsByTeacherId;
 using Application.Users.GetById;
 using Application.Users.GetRole;
+using Application.Users.GetStudents;
+using Application.Users.GetTeachers;
 using Application.Users.GetUserRole;
 using Application.Users.Login;
 using Application.Users.Update;
 using Application.Users.UpdatePermission;
+using Application.Users.UpdateRelation.UpdateTeacher;
 using Azure;
 using Azure.Core;
 using Infrastructure.BlobStorage.Service;
@@ -31,13 +37,28 @@ public class UsersController : ControllerBase
         _blobService = blobService;
         _httpContextAccessor = httpContextAccessor;
     }
-
+    [Authorize]
+    [HttpGet("get-users")]
+    public async Task<GetAllResponseDto> GetUsers()
+    {
+        var users = await _mediator.Send(new GetAllRequestDto());
+        return users;
+    }
+    
     [Authorize]
     [HttpGet("get-user")]
     public async Task<GetUserResponseDto> Get()
     {
         var user = await _mediator.Send(new GetUserRequestDto { UserId = 0 });
         return user;
+    }
+    
+    [Authorize]
+    [HttpGet("get-user/{userId:int}")]
+    public async Task<GetUserByIdResponseDto> GetUserById([FromRoute] int userId)
+    {
+        var userById = await _mediator.Send(new GetUserByIdRequestDto { UserId = userId });
+        return userById;
     }
     
     [HttpPost("create-user")]
@@ -154,5 +175,45 @@ public class UsersController : ControllerBase
             await _blobService.DeleteAsync(blobId, Constants.Constants.USER_CONTAINER);
             return BadRequest(exception.Message);
         }
+    }
+    
+    
+    [Authorize]
+    [HttpPut("assign-student")]
+    public async Task<UpdateTeacherResponseDto> AssignStudent([FromBody] UpdateTeacherRequestDto request)
+    {
+        return await _mediator.Send(request);
+    }
+    
+    [Authorize]
+    [HttpGet("get-students/{teacherId:int}")]
+    public async Task<GetAllStudentsByTeacherIdResponseDto> GetStudents([FromRoute]  int teacherId)
+    {
+        var students = await _mediator.Send(new GetAllStudentsByTeacherIdRequestDto(){TeacherId = teacherId});
+        return students;
+    }
+    
+    [Authorize]
+    [HttpGet("/admin/get-teachers")]
+    public async Task<GetTeachersResponseDto> GetTeachers()
+    {
+        var teachers = await _mediator.Send(new  GetTeachersRequestDto());
+        return teachers;
+    }
+    
+    [Authorize]
+    [HttpGet("/admin/get-students")]
+    public async Task<GetStudentsResponseDto> GetStudents()
+    {
+        var students = await _mediator.Send(new  GetStudentsRequestDto());
+        return students;
+    }
+
+    [Authorize]
+    [HttpPost("permission-request")]
+    public async Task<PermissionRequestsResponseDto> PermissionRequest([FromBody] PermissionRequestsRequestDto request, CancellationToken cancellationToken)
+    {
+        var permissions = await _mediator.Send(request);
+        return permissions;
     }
 }
