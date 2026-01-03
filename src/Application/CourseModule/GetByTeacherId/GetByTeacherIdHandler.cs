@@ -42,7 +42,16 @@ public class GetByTeacherIdHandler : IRequestHandler<GetByTeacherIdRequestDto, G
                 dictionaryCount += folder.Dictionaries.Count;
             }
             studentCount += module.Students.Count;
-            
+            var students = new List<GetByTeacherIdStudentsViewModel>();
+            foreach (var student in module.Students)
+            {
+                students.Add(new GetByTeacherIdStudentsViewModel
+                {
+                    UserId = student.UserId,
+                    Email = student.Email,
+                    Username = student.Username,
+                });
+            }
             var moduleResponse = new GetByTeacherIdViewModel()
             {
                 Id = module.Id, 
@@ -51,6 +60,7 @@ public class GetByTeacherIdHandler : IRequestHandler<GetByTeacherIdRequestDto, G
                 UserId = module.UserId,
                 DictionaryCount = dictionaryCount,
                 LearnLevel = module.LearnLevel,
+                Students = students,
             };
             modulesResponse.Add(moduleResponse);
         }

@@ -44,6 +44,7 @@ public class UpdateQuizHandler : IRequestHandler<UpdateQuizRequestDto, UpdateQui
             response.TestUnits.Add(new CreateTestUnitViewModel
             {
                 TestUnitId = tu.Id,
+                
                 AdditionalAnswers = tu.AdditionalAnswers,
                 DefinitionId = tu.DefinitionId,
                 /*

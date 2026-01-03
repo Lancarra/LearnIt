@@ -8,6 +8,6 @@ public class GetByTeacherIdViewModel
     public string? LearnLevel { get; set; }
     public int UserId { get; set; }
     public int DictionaryCount { get; set; }
-
+    public List<GetByTeacherIdStudentsViewModel> Students { get; set; }
 
 }

@@ -1,6 +1,8 @@
+using System.Net;
 using Domain.Models.Quiz;
 using Infrastructure.CurrentUserAccessor;
 using Infrastructure.Database;
+using Infrastructure.Errors;
 using Infrastructure.Helpers;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,14 +39,21 @@ public class ResultBuilder : IResultBuilder
         
         foreach (var answer in testCardAnswer.TestUnitAnswers)
         {
-            var testUnit =  testCard.TestUnits.FirstOrDefault(t => t.Id == answer.TestUnitId);
-            if (testUnit.Definition.Meaning.ToLower() == answer.Answer.ToLower())
+            try
             {
-                correctAnswer++;
+                var testUnit = testCard.TestUnits.FirstOrDefault(t => t.Id == answer.TestUnitId);
+                if (testUnit != null && testUnit.Definition.Meaning.ToLower() == answer.Answer.ToLower())
+                {
+                    correctAnswer++;
+                }
+                else
+                {
+                    incorrectAnswer++;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                incorrectAnswer++;
+                throw new RestException(HttpStatusCode.BadRequest, new {ex.Message});
             }
         }
         var achievementDescription = string.Empty;

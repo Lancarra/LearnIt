@@ -74,6 +74,7 @@ public class TestingBuilder : ITestingBuilder
         if (!string.IsNullOrWhiteSpace(name))
         {
             card.Name = name;
+            card.Updated = DateTime.Now;
         }
         var dtoById = testUnits.ToDictionary(t => t.Id);
         foreach (var unit in card.TestUnits)

@@ -35,9 +35,10 @@ public class GetFolderHandler : IRequestHandler<GetFolderRequestDto, GetFolderRe
         {
             throw new RestException(HttpStatusCode.Unauthorized, new {Message = "You are haven't permission to perform this action"});
         }
+        var course = await _context.CourseModules.FirstOrDefaultAsync(cm => cm.Id == request.CourseModuleId, cancellationToken);
         var folders = await _context.Folders
             .Include(f => f.CourseModule)
-            .Where(f => f.CourseModuleId == request.CourseModuleId && f.CourseModule.UserId == user.UserId)
+            .Where(f => f.CourseModuleId == request.CourseModuleId && f.CourseModule.UserId == course.UserId )
             .ToListAsync(cancellationToken);
     
         PropertyChecker.CheckNullAndThrow404(folders);

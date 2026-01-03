@@ -7,6 +7,7 @@ using Application.Quiz.Answer.Create;
 using Application.Quiz.Get;
 using Application.Quiz.GetCards;
 using Application.Quiz.GetWithDefinitions;
+using Application.Quiz.ResultByDictionaryKakoito;
 using Application.Quiz.Update;
 using Infrastructure.BlobStorage.Service;
 using Infrastructure.Security;
@@ -69,6 +70,14 @@ public class QuizController
     [HttpPost("check-quiz")]
     [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
     public async Task<CheckAnswerResponseDto> CheckQuiz([FromBody] CheckAnswerRequestDto request)
+    {
+        var result = await _mediator.Send(request);
+        return result;
+    }
+    
+    [HttpPost("result-by-dictionary")]
+    [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
+    public async Task<ResultByDictionaryResponseDto> ResultByDictionary([FromBody] ResultByDictionaryRequestDto request)
     {
         var result = await _mediator.Send(request);
         return result;
